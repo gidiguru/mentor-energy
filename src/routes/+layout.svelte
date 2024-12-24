@@ -68,7 +68,7 @@
                 <img 
                 src={$isDarkMode ? '/logos/mentorenergy_Main_Logo2.svg' : '/logos/mentorenergy_Black_Logo2.svg'}
                 alt="mentor.energy logo" 
-                class="hidden md:block h-10 md:h-12 w-auto" 
+                class="hidden md:block h-10 md:h-12pwd w-auto" 
               />
               <img 
                 src="/logos/mentorenergy_Logo_Symbol2.svg"
