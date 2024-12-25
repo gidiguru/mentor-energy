@@ -71,7 +71,7 @@
                 class="hidden md:block h-10 md:h-12pwd w-auto" 
               />
               <img 
-                src="/logos/mentorenergy_Logo_Symbol2.svg"
+                src={$isDarkMode ? "/logos/mentorenergy_Logo_Symbol2_dark.svg": "/logos/mentorenergy_Logo_Symbol2.svg" }
                 alt="mentor.energy logo" 
                 class="block md:hidden h-10 w-auto" 
               />
@@ -94,7 +94,7 @@
               <LightSwitch />
               <button 
                 type="button"
-                class="btn variant-ghost-surface md:hidden"
+                class="btn variant-ghost-surface md:hidden p-4 text-3xl"
                 on:click={toggleDrawer}
               >
                 <span class="text-2xl">☰</span>
@@ -113,6 +113,7 @@
   <slot />
 
   <!-- Footer -->
+
   <svelte:fragment slot="footer">
     <footer class="p-4">
       <p class="text-center">&copy; {new Date().getFullYear()} mentor.energy</p>
