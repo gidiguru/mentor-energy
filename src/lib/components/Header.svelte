@@ -1,70 +1,69 @@
 <script lang="ts">
-    import { AppShell, AppBar } from '@skeletonlabs/skeleton';
-    import { LightSwitch } from '@skeletonlabs/skeleton';
-    import type { drawerStore } from '@skeletonlabs/skeleton';
-    import { page } from '$app/stores';
-    import NavMenu from '$lib/components/NavMenu.svelte';
-    
-    const navItems = [
-      { href: '/', label: 'Home' },
-      { href: '/dashboard', label: 'Dashboard' },
-      { href: '/mentors', label: 'Find Mentors' },
-      { href: '/resources', label: 'Resources' },
-      { href: '/profile', label: 'Profile' }
-    ];
+  import { AppBar, LightSwitch } from '@skeletonlabs/skeleton';
+  import { page } from '$app/stores';
+  import { getDrawerStore } from '@skeletonlabs/skeleton';
   
-    function drawerOpen(): void {
-      drawerStore.open({
-        id: 'nav-drawer',
-        position: 'right',
-        width: 'w-[280px]',
-        padding: 'p-4',
-        component: NavMenu
-      });
-    }
-  </script>
+  export let isDarkMode: boolean;
+  const drawerStore = getDrawerStore();
   
-  <NavMenu />
+  const navItems = [
+    { href: '/', label: 'Home' },
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/mentors', label: 'Find Mentors' },
+    { href: '/resources', label: 'Resources' },
+    { href: '/profile', label: 'Profile' }
+  ];
+
+  function toggleDrawer(): void {
+    drawerStore.set({
+      id: 'mobile-nav',
+      position: 'right',
+      width: 'w-80',
+      padding: 'p-4',
+      open: true,
+      bgBackdrop: 'bg-black/50'
+    });
+  }
+</script>
+
+<AppBar>
+  <svelte:fragment slot="lead">
+    <a href="/" class="flex items-center space-x-2">
+      <img 
+        src={isDarkMode ? '/logos/mentorenergy_Main_Logo2.svg' : '/logos/mentorenergy_Black_Logo2.svg'}
+        alt="mentor.energy logo" 
+        class="hidden md:block h-10 md:h-12 w-auto" 
+      />
+      <img 
+        src={isDarkMode ? "/logos/mentorenergy_Logo_Symbol2_dark.svg": "/logos/mentorenergy_Logo_Symbol2.svg" }
+        alt="mentor.energy logo" 
+        class="block md:hidden h-10 w-auto" 
+      />
+    </a>
+  </svelte:fragment>
   
-  <AppShell>
-    <svelte:fragment slot="header">
-      <AppBar>
-        <svelte:fragment slot="lead">
-          <a href="/" class="font-bold text-xl">mentor.energy</a>
-        </svelte:fragment>
-        
-        <svelte:fragment slot="trail">
-          <!-- Desktop Navigation -->
-          <nav class="hidden md:flex space-x-6">
-            {#each navItems as item}
-              <a 
-                href={item.href} 
-                class="font-medium hover:text-primary-500 {$page.url.pathname === item.href ? 'text-primary-500' : ''}"
-              >
-                {item.label}
-              </a>
-            {/each}
-          </nav>
-  
-          <div class="flex items-center space-x-4">
-            <LightSwitch />
-            <button 
-              class="btn btn-sm variant-ghost md:hidden"
-              on:click={drawerOpen}
-            >
-              ☰
-            </button>
-            <a href="/login" class="btn variant-filled-primary">Sign In</a>
-          </div>
-        </svelte:fragment>
-      </AppBar>
-    </svelte:fragment>
-  
-    <slot />
-  
-    <svelte:fragment slot="footer">
-      <div class="p-4 text-center">
-        <p>&copy; {new Date().getFullYear()} mentor.energy</p>
-      </div>
-    </svelte:fragment>
-  </AppShell>
+  <svelte:fragment slot="trail">
+    <nav class="hidden md:flex space-x-6">
+      {#each navItems as item}
+        <a 
+          href={item.href} 
+          class="text-lg font-medium hover:text-primary-500 transition-colors {$page.url.pathname === item.href ? 'text-primary-500' : ''}"
+        >
+          {item.label}
+        </a>
+      {/each}
+    </nav>
+
+    <div class="flex items-center space-x-4">
+      <LightSwitch />
+      <button 
+        type="button"
+        class="btn variant-ghost-surface md:hidden"
+        on:click={toggleDrawer}
+      >
+        <span class="text-2xl">☰</span>
+      </button>
+      <a href="/login" class="btn variant-filled-primary">Sign In</a>
+    </div>
+  </svelte:fragment>
+</AppBar>
