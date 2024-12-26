@@ -2,7 +2,12 @@
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import AIChatPreview from '$lib/components/AIChatPreview.svelte';
-	
+	import { goto } from '$app/navigation';
+
+	function handleGetStarted() {
+    goto('/signup');
+  }
+
 	// Stats for the platform
 	const stats = [
 	  { label: 'Active Mentors', value: '50+' },
@@ -70,13 +75,12 @@
 			while still in university. Bridge the gap between education and industry.
 		  </p>
 		  <div class="flex flex-col sm:flex-row gap-4">
-			<a href="/register" class="btn variant-filled-primary">Get Started</a>
+			<a href="/signup" class="btn variant-filled-primary">Get Started</a>
 			<a href="/mentors" class="btn variant-ghost-surface">Browse Mentors</a>
 		  </div>
 		</div>
-		<div class="relative" in:fly="{{ y: 50, duration: 1000 }}">
+		<div class="relative" in:fly={{ y: 50, duration: 1000 }}>
 		  <div class="rounded-lg shadow-xl bg-surface-200-700-token p-8 h-[400px] flex items-center justify-center">
-			<!-- Hero illustration as a background pattern -->
 			<div class="text-center">
 			  <span class="text-6xl mb-4 block">🎓🌍</span>
 			  <p class="text-xl font-medium">Connecting Students with Industry Experts</p>

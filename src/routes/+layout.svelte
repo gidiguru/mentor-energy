@@ -35,12 +35,15 @@
 </script>
 
 <AppShell>
+  <!-- Header -->
   <svelte:fragment slot="header">
     <Header isDarkMode={$isDarkMode} />
   </svelte:fragment>
 
+  <!-- Main Section -->
   <slot />
 
+  <!-- Footer -->
   <Footer>
     <div class="container mx-auto">
       <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
@@ -48,7 +51,7 @@
       </div>
     </div>
   </Footer>
-
 </AppShell>
 
+<!-- Mobile Navigation -->
 <MobileNav />
