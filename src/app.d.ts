@@ -18,6 +18,9 @@ declare global {
     }
     interface PageData {
       session: Session | null
+	  error?: string | null;
+	  testData?: any[] | null;
+	  supabase?: any;
     }
   }
 }

@@ -1,6 +1,5 @@
-<script lang="ts">
-    import SignupWidget from '$lib/components/SignupWidget.svelte';
-  </script>
+<script lang="ts"></script>
+
   
   <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full mx-auto">
@@ -12,7 +11,5 @@
           Connect with industry professionals and advance your career
         </p>
       </div>
-  
-      <SignupWidget />
     </div>
   </div>
