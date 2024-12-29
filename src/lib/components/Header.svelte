@@ -63,7 +63,7 @@
       >
         <span class="text-2xl">☰</span>
       </button>
-      <a href="/supabase-test" class="btn variant-filled-primary">Sign In</a>
+      <a href="/auth" class="btn variant-filled-primary">Sign In</a>
     </div>
   </svelte:fragment>
 </AppBar>

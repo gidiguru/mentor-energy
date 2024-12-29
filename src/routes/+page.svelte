@@ -4,8 +4,9 @@
 	import AIChatPreview from '$lib/components/AIChatPreview.svelte';
 	import { goto } from '$app/navigation';
 
+
 	function handleGetStarted() {
-    goto('/supabase-test');
+    goto('/signup');
   }
 
 	// Stats for the platform
@@ -75,7 +76,7 @@
 			while still in university. Bridge the gap between education and industry.
 		  </p>
 		  <div class="flex flex-col sm:flex-row gap-4">
-			<a href="/supabase-test" class="btn variant-filled-primary">Get Started</a>
+			<a href="/signup" class="btn variant-filled-primary">Get Started</a>
 			<a href="/mentors" class="btn variant-ghost-surface">Browse Mentors</a>
 		  </div>
 		</div>
@@ -153,8 +154,8 @@
 	  in Nigeria's energy sector.
 	</p>
 	<div class="flex flex-col sm:flex-row gap-4 justify-center">
-	  <a href="/supabase-test" class="btn variant-filled-primary">Sign Up as Student</a>
-	  <a href="/become-mentor" class="btn variant-ghost-surface">Become a Mentor</a>
+	  <a href="/signup" class="btn variant-filled-primary">Sign Up as Student</a>
+	  <a href="/signup" class="btn variant-ghost-surface">Become a Mentor</a>
 	</div>
   </div>
   
