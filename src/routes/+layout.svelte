@@ -12,6 +12,7 @@
   import Header from '$lib/components/Header.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import MobileNav from '$lib/components/MobileNav.svelte';
+  import { Toast } from '@skeletonlabs/skeleton';
 
   // Props & Derived Values
   interface LayoutData {
@@ -79,6 +80,7 @@
   });
 </script>
 
+<Toast />
 <AppShell>
   <svelte:fragment slot="header">
     <Header isDarkMode={$isDarkMode} />

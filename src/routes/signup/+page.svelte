@@ -1,9 +1,17 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  import LinkedInIcon from '../../../src/lib/components/LinkedInIcon.svelte';
-  import type { ActionData } from './$types';
+  import EmailSignup from '$lib/components/EmailSignup.svelte';
+  import LinkedInSignup from '$lib/components/LinkedInSignup.svelte';
+  import { goto } from '$app/navigation';
 
-  export let form: FormData | null = null;
+    export let form: {
+    error?: boolean;
+    existingUser?: boolean;
+    email?: string;
+    message?: string;
+    status?: number;
+    success?: boolean;
+    requiresEmailConfirmation?: boolean;
+  } | null = null;
 
   interface FormData {
     discipline: string;
@@ -18,6 +26,7 @@
     missing?: string;
   }
 
+
   let step = 1;
   let formData: FormData = {
     discipline: '',
@@ -29,14 +38,24 @@
     password: ''
   };
 
+  let existingUserEmail: string | null = null;
+
   $: {
-    if (form?.error) {
-      console.error(form.error);
-    }
-    if (form?.message) {
-      console.log(form.message);
+  if (form) {
+    console.log('Reactive block triggered', form);
+    
+    if (form.success && form.requiresEmailConfirmation) {
+      step = 5;
+    } 
+    
+    // Add explicit check for existing user
+    if ((form.success === true && form.existingUser === true) || 
+        (form.error === true && form.existingUser === true)) {
+      existingUserEmail = form.email ?? null;
+      step = 6;
     }
   }
+}
 
   const disciplines = [
     { id: 'geoscience', label: 'Geoscience', active: true },
@@ -57,10 +76,45 @@
     { id: 'mentor', label: 'Mentor' }
   ];
 
-  function handleSelection(field: keyof FormData, value: string) {
+
+$: {
+  console.log('Current Step:', step);
+  console.log('Form State:', form);
+  console.log('Existing User Email:', existingUserEmail);
+}
+
+function handleSelection(field: keyof FormData, value: string) {
     formData[field] = value;
     step++;
+}
+
+function handleFormUpdate(event: CustomEvent) {
+  const result = event.detail;
+  console.log('Form update received:', result);
+
+  if (result.type === 'success') {
+    form = {
+      success: true,
+      requiresEmailConfirmation: result.requiresEmailConfirmation || false,
+      email: result.email,
+      existingUser: result.data?.existingUser || false
+    };
+
+    // Check for existing user and set step accordingly
+    if (form.existingUser) {
+      existingUserEmail = form.email ?? null;
+      step = 6;
+    }
+  } else if (result.type === 'failure' && result.status === 400 && result.data?.existingUser) {
+    form = {
+      error: true,
+      existingUser: true,
+      email: result.data.email
+    };
+    existingUserEmail = result.data.email ?? null;
+    step = 6;
   }
+}
 </script>
 
 <div class="container mx-auto p-6">
@@ -118,16 +172,7 @@
       <div class="space-y-6">
         <h2 class="h2 text-center mb-6">Create your account</h2>
         
-        <form use:enhance method="POST" action="?/linkedinSignup" class="space-y-4">
-          <input type="hidden" name="discipline" value={formData.discipline}>
-          <input type="hidden" name="qualification" value={formData.qualification}>
-          <input type="hidden" name="role" value={formData.role}>
-          
-          <button type="submit" class="btn variant-filled-primary w-full flex items-center justify-center gap-2">
-            <LinkedInIcon size={20} />
-            Sign up with LinkedIn
-          </button>
-        </form>
+        <LinkedInSignup {formData} on:formUpdate={handleFormUpdate}/>
         
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
@@ -138,65 +183,68 @@
           </div>
         </div>
 
-        <form use:enhance method="POST" action="?/signup" class="space-y-4">
-          <input type="hidden" name="discipline" value={formData.discipline}>
-          <input type="hidden" name="qualification" value={formData.qualification}>
-          <input type="hidden" name="role" value={formData.role}>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <label class="label">
-              <input
-                type="text"
-                name="firstName"
-                placeholder="First Name"
-                bind:value={formData.firstName}
-                class="input"
-                required
-              />
-            </label>
-            <label class="label">
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Last Name"
-                bind:value={formData.lastName}
-                class="input"
-                required
-              />
-            </label>
-          </div>
-          
-          <label class="label">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              bind:value={formData.email}
-              class="input"
-              required
-            />
-          </label>
-          
-          <label class="label">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              bind:value={formData.password}
-              class="input"
-              required
-            />
-          </label>
-          
-          <button type="submit" class="btn variant-filled-primary w-full">
-            Sign up with Email
-          </button>
-        </form>
+        <EmailSignup {formData} on:formUpdate={handleFormUpdate} />
       </div>
+    {:else if step === 5}
+      <div class="space-y-6 text-center">
+        <div class="text-4xl mb-4">✉️</div>
+        <h2 class="h2">Check Your Email</h2>
+        <p class="text-lg">
+          We've sent a confirmation email to <strong>{form?.email}</strong>
+        </p>
+        <p class="mt-4">
+          Please click the link in the email to activate your account. 
+          The link will expire in 24 hours.
+        </p>
+        <div class="pt-6">
+          <p class="text-sm text-surface-600-300-token">
+            Didn't receive the email? Check your spam folder or
+            <button 
+              class="text-primary-500 hover:underline" 
+              on:click={() => step = 4}
+            >
+              try signing up again
+            </button>
+          </p>
+        </div>
+      </div>
+        {:else if step === 6}
+    <div class="space-y-6 text-center">
+      <div class="text-4xl mb-4">🔔</div>
+      <h2 class="h2">Account Already Exists</h2>
+      <p class="text-lg">
+        An account is already registered with the email <strong>{existingUserEmail}</strong>
+      </p>
+      <div class="space-y-4 mt-6">
+        <button 
+          class="btn variant-filled-primary w-full"
+          on:click={() => {
+            // Redirect to login or populate login form
+            goto('/auth?email=' + encodeURIComponent(existingUserEmail || ''));
+          }}
+        >
+          Go to Login
+        </button>
+        <button 
+          class="btn variant-ghost-surface w-full"
+          on:click={() => {
+            // Reset to email entry step
+            existingUserEmail = null;
+            step = 4;
+          }}
+        >
+          Try Different Email
+        </button>
+      </div>
+      <p class="text-sm text-surface-600-300-token mt-4">
+        If you've forgotten your password, you can reset it on the login page.
+      </p>
+    </div>
     {/if}
+    
 
     <div class="mt-4 flex justify-between">
-      {#if step > 1}
+      {#if step > 1 && step < 5}
         <button
           on:click={() => step--}
           class="btn variant-ghost-primary"
@@ -207,3 +255,9 @@
     </div>
   </div>
 </div>
+
+<style lang="postcss">
+  .card {
+    @apply backdrop-blur-lg border border-surface-500/30 rounded-lg;
+  }
+</style>

@@ -1,52 +1,130 @@
 <script lang="ts">
-  import { invalidate } from '$app/navigation';
-  import type { PageData } from './$types';
+    import { invalidateAll } from '$app/navigation';
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
 
-  export let data: PageData;
-  $: ({ notes, supabase, user } = data);
+    export let data;
 
-  async function handleSubmit(evt: SubmitEvent) {
-      evt.preventDefault();
-      const form = evt.target as HTMLFormElement;
-      if (!form) return;
+    let { supabase, session, user } = data;
+    let profile: any = null;
+    let loading = true;
+    let error: string | null = null;
 
-      const note = (new FormData(form).get('note') ?? '') as string;
-      if (!note) return;
+    $: ({ supabase, session, user } = data);
 
-      const { error } = await supabase.from('notes').insert({ note });
-      if (error) console.error(error);
+    onMount(async () => {
+        loading = true;
+        try {
+            if (session?.user) {
+                const { data: profileData, error: fetchError } = await supabase
+                    .from('users')
+                    .select('first_name, last_name, email, role, discipline, qualification')
+                    .eq('id', session.user.id)
+                    .single();
 
-      invalidate('supabase:db:notes');
-      form.reset();
-  }
+                if (fetchError) throw fetchError;
+                profile = profileData;
+            }
+        } catch (err) {
+            console.error('Error fetching profile:', err);
+            error = err instanceof Error ? err.message : 'An unexpected error occurred';
+        } finally {
+            loading = false;
+        }
+    });
+
+    async function signOut() {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            await invalidateAll(); 
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+    }
 </script>
 
 <div class="container mx-auto p-4">
-  <div class="card p-4 variant-filled-surface">
-      <header class="card-header">
-          <h1 class="h1">Private page for user: {user?.email}</h1>
-          <h2 class="h2">Notes</h2>
-      </header>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Profile Card -->
+        <div class="card p-4 space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="h2">Profile</h2>
+                <button class="btn variant-filled-error" on:click={signOut}>
+                    Sign Out
+                </button>
+            </div>
+            
+            {#if loading}
+                <p>Loading profile...</p>
+            {:else if error}
+                <div class="text-error-500">
+                    {error}
+                </div>
+            {:else if profile}
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold">Name:</span>
+                        <span>{profile.first_name} {profile.last_name}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold">Email:</span>
+                        <span>{profile.email}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold">Role:</span>
+                        <span class="capitalize">{profile.role}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold">Discipline:</span>
+                        <span class="capitalize">{profile.discipline}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold">Qualification:</span>
+                        <span class="capitalize">{profile.qualification}</span>
+                    </div>
+                </div>
+            {/if}
+        </div>
 
-      <section class="p-4">
-          <ul class="space-y-2">
-              {#each notes as note (note.id)}
-                  <li class="card p-4 variant-ghost-surface">{note.note}</li>
-              {/each}
-          </ul>
+        <!-- Stats Card -->
+        <div class="card p-4 space-y-4">
+            <h2 class="h2">Activity</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-center p-4 rounded bg-surface-100-800-token">
+                    <div class="text-2xl font-bold">0</div>
+                    <div class="text-sm">Sessions</div>
+                </div>
+                <div class="text-center p-4 rounded bg-surface-100-800-token">
+                    <div class="text-2xl font-bold">0</div>
+                    <div class="text-sm">Projects</div>
+                </div>
+                <div class="text-center p-4 rounded bg-surface-100-800-token">
+                    <div class="text-2xl font-bold">0</div>
+                    <div class="text-sm">Resources</div>
+                </div>
+                <div class="text-center p-4 rounded bg-surface-100-800-token">
+                    <div class="text-2xl font-bold">0</div>
+                    <div class="text-sm">Certificates</div>
+                </div>
+            </div>
+        </div>
 
-          <form on:submit={handleSubmit} class="mt-4">
-              <label class="label">
-                  <span>Add a note</span>
-                  <input 
-                      name="note" 
-                      type="text" 
-                      class="input"
-                      placeholder="Enter your note..."
-                  />
-              </label>
-              <button type="submit" class="btn variant-filled-primary mt-2">Add Note</button>
-          </form>
-      </section>
-  </div>
+        <!-- Quick Actions -->
+        <div class="card p-4 space-y-4">
+            <h2 class="h2">Quick Actions</h2>
+            <div class="grid gap-2">
+                <button class="btn variant-filled-primary">Schedule Session</button>
+                <button class="btn variant-filled-secondary">Browse Resources</button>
+                <button class="btn variant-filled-tertiary">View Projects</button>
+                <button class="btn variant-filled-surface">Edit Profile</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style lang="postcss">
+    .card {
+        @apply backdrop-blur-lg border border-surface-500/30 rounded-lg;
+    }
+</style>
