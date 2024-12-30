@@ -2,8 +2,12 @@
   import { AppBar, LightSwitch } from '@skeletonlabs/skeleton';
   import { page } from '$app/stores';
   import { getDrawerStore } from '@skeletonlabs/skeleton';
+  import { invalidateAll } from '$app/navigation';
   
   export let isDarkMode: boolean;
+  export let supabase: any;
+  export let session: any;
+  
   const drawerStore = getDrawerStore();
   
   const navItems = [
@@ -13,6 +17,16 @@
     { href: '/resources', label: 'Resources' },
     { href: '/profile', label: 'Profile' }
   ];
+
+  async function signOut() {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      await invalidateAll();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  }
 
   function toggleDrawer(): void {
     drawerStore.set({
@@ -63,7 +77,11 @@
       >
         <span class="text-2xl">☰</span>
       </button>
-      <a href="/auth" class="btn variant-filled-primary">Sign In</a>
+      {#if session}
+        <button class="btn variant-filled-error" on:click={signOut}>Sign Out</button>
+      {:else}
+        <a href="/auth" class="btn variant-filled-primary">Sign In</a>
+      {/if}
     </div>
   </svelte:fragment>
 </AppBar>

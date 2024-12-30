@@ -32,16 +32,6 @@
             loading = false;
         }
     });
-
-    async function signOut() {
-        try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-            await invalidateAll(); 
-        } catch (error) {
-            console.error('Error signing out:', error);
-        }
-    }
 </script>
 
 <div class="container mx-auto p-4">
@@ -50,9 +40,6 @@
         <div class="card p-4 space-y-4">
             <div class="flex justify-between items-center">
                 <h2 class="h2">Profile</h2>
-                <button class="btn variant-filled-error" on:click={signOut}>
-                    Sign Out
-                </button>
             </div>
             
             {#if loading}

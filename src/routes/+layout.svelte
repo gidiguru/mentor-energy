@@ -83,7 +83,9 @@
 <Toast />
 <AppShell>
   <svelte:fragment slot="header">
-    <Header isDarkMode={$isDarkMode} />
+    <Header isDarkMode={$isDarkMode}
+    supabase={data.supabase} 
+    session={data.session} />
   </svelte:fragment>
 
   <div class="min-h-screen">
