@@ -73,7 +73,7 @@
 		  </h1>
 		  <p class="text-lg sm:text-xl">
 			Connect with industry mentors, access virtual labs, and gain practical experience 
-			while still in university. Bridge the gap between education and industry.
+			while still in or out of the university. Bridge the gap between education and industry.
 		  </p>
 		  <div class="flex flex-col sm:flex-row gap-4">
 			<a href="/signup" class="btn variant-filled-primary">Get Started</a>

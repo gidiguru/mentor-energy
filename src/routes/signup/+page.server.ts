@@ -20,25 +20,53 @@ interface LinkedInSignupData extends BaseSignupData {
 }
 
 function validateEmailSignup(formData: FormData): EmailSignupData {
- const fields = {
-   email: formData.get('email')?.toString().trim(),
-   password: formData.get('password')?.toString(),
-   firstName: formData.get('firstName')?.toString().trim(), 
-   lastName: formData.get('lastName')?.toString().trim(),
-   discipline: formData.get('discipline')?.toString().trim(),
-   qualification: formData.get('qualification')?.toString().trim(),
-   role: formData.get('role')?.toString().trim()
- };
-
- const requiredFields = ['email', 'password', 'firstName', 'lastName', 'discipline', 'qualification', 'role'] as const;
- const missing = requiredFields.find(field => !fields[field]);
-
- if (missing) {
-   throw new Error(`Missing required field: ${missing}`);
+  const fields = {
+    email: formData.get('email')?.toString().trim() || '',
+    password: formData.get('password')?.toString() || '',
+    firstName: formData.get('firstName')?.toString().trim() || '', 
+    lastName: formData.get('lastName')?.toString().trim() || '',
+    discipline: formData.get('discipline')?.toString().trim() || '',
+    qualification: formData.get('qualification')?.toString().trim() || '',
+    role: formData.get('role')?.toString().trim() || ''
+  };
+ 
+  const requiredFields = ['email', 'password', 'firstName', 'lastName', 'discipline', 'qualification', 'role'] as const;
+  const missing = requiredFields.find(field => !fields[field]);
+ 
+  if (missing) {
+    throw new Error(`Missing required field: ${missing}`);
+  }
+ 
+  // Comprehensive password validation
+  const password = fields.password;
+  const errors: string[] = [];
+ 
+  if (password.length < 8) {
+    errors.push('at least 8 characters long');
+  }
+ 
+  if (!/[A-Z]/.test(password)) {
+    errors.push('one uppercase letter');
+  }
+ 
+  if (!/[a-z]/.test(password)) {
+    errors.push('one lowercase letter');
+  }
+ 
+  if (!/[0-9]/.test(password)) {
+    errors.push('one number');
+  }
+ 
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    errors.push('one special character');
+  }
+ 
+  if (errors.length > 0) {
+    throw new Error(`Password must include: ${errors.join(', ')}`);
+  }
+ 
+  return fields as EmailSignupData;
  }
-
- return fields as EmailSignupData;
-}
 
 function validateLinkedInSignup(formData: FormData): BaseSignupData {
  const fields = {

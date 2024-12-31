@@ -16,7 +16,7 @@
    
     let loading = false;
     let passwordError = '';
-    
+
     const passwordRequirements = {
       minLength: 8,
       hasUpperCase: false, 
@@ -24,7 +24,7 @@
       hasNumber: false,
       hasSpecial: false
     };
- 
+
     $: passwordStrength = validatePasswordStrength(formData.password);
     
     function validatePasswordStrength(pass: string) {
@@ -34,36 +34,56 @@
       passwordRequirements.hasSpecial = /[^A-Za-z0-9]/.test(pass);
       return Object.values(passwordRequirements).filter(Boolean).length;
     }
- 
+
     function validatePassword() {
-      const isLengthValid = formData.password.length >= 8;
-      const isStrengthValid = passwordStrength >= 3;
+      const pass = formData.password;
+      const errors: string[] = [];
 
-      if (!isLengthValid) {
-        passwordError = 'Password must be at least 8 characters long';
-        return false;
+      if (pass.length < 8) {
+        errors.push('At least 8 characters long');
       }
 
-      if (!isStrengthValid) {
-        passwordError = 'Password must include at least 3 of the following: uppercase, lowercase, number, special character';
-        return false;
+      if (!/[A-Z]/.test(pass)) {
+        errors.push('One uppercase letter');
       }
 
-      passwordError = '';
-      return true;
+      if (!/[a-z]/.test(pass)) {
+        errors.push('One lowercase letter');
+      }
+
+      if (!/[0-9]/.test(pass)) {
+        errors.push('One number');
+      }
+
+      if (!/[^A-Za-z0-9]/.test(pass)) {
+        errors.push('One special character');
+      }
+
+      passwordError = errors.length > 0 
+        ? 'Password must include: ' + errors.join(', ') 
+        : '';
+
+      return errors.length === 0;
     }
    
     function handleSubmit(event: SubmitEvent) {
+      // Validate password before form submission
       if (!validatePassword()) {
         event.preventDefault();
-        return;
+        return false;
       }
+      return true;
     }
    </script>
    
    <form 
-     on:submit={handleSubmit}
+     on:submit|preventDefault={handleSubmit}
      use:enhance={() => {
+      // Only proceed with loading if validation passes
+      if (!validatePassword()) {
+        return;
+      }
+      
       loading = true;
       return async ({ result }) => {
         loading = false;
@@ -156,7 +176,7 @@
         </svg>
       </div>
     </label>
-    
+
     {#if passwordError}
       <div class="alert variant-filled-error">{passwordError}</div>
     {/if}

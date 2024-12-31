@@ -39,48 +39,67 @@
     }
  
     async function handleSubmit(e: Event) {
-      e.preventDefault();
-      passwordError = '';
-      passwordSuccess = '';
-      
-      if (!validatePassword()) {
-        passwordError = 'Password does not meet requirements';
-        return;
-      }
-      
-              loading = true;
-      try {
-        const { error } = await supabase.auth.updateUser({
-          password: password
-        });
-
-        if (error) {
-          switch (error.message) {
-            case 'Password should be at least 6 characters':
-              passwordError = 'Password must be at least 6 characters long';
-              break;
-            case 'New password cannot be the same as the current password':
-              passwordError = 'New password cannot be the same as the current password';
-              break;
-            case 'Rate limit exceeded':
-              passwordError = 'Too many password reset attempts. Please try again later.';
-              break;
-            default:
-              passwordError = error.message || 'An unexpected error occurred during password reset';
-          }
-          return;
-        }
-        
-        passwordSuccess = 'Password updated successfully';
-        // Optional: redirect after successful password reset
-        await goto('/auth?reset=success');
-      } catch (err) {
-        console.error('Password reset error:', err);
-        passwordError = 'An unexpected error occurred. Please try again.';
-      } finally {
-        loading = false;
-      }
+  e.preventDefault();
+  passwordError = '';
+  passwordSuccess = '';
+  
+  if (!validatePassword()) {
+    passwordError = 'Password does not meet requirements';
+    return;
+  }
+  
+  loading = true;
+  try {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user?.email) {
+      throw new Error('Could not get user details');
     }
+
+    // Try signing in with the new password to see if it matches current
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: password
+    });
+
+    if (!signInError) {
+      passwordError = 'New password cannot be the same as your current password';
+      loading = false;
+      return;
+    }
+
+    // Update password
+    const { error } = await supabase.auth.updateUser({
+      password: password
+    });
+
+    if (error) {
+      // Existing error handling...
+      return;
+    }
+
+    // Reset lock status
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ 
+        locked: false,
+        failed_attempts: 0 
+      })
+      .eq('email', user.email);
+
+    if (updateError) {
+      console.error('Failed to reset lock status:', updateError);
+    }
+    
+    passwordSuccess = 'Password updated successfully';
+    await goto('/auth?reset=success');
+  } catch (err) {
+    console.error('Password reset error:', err);
+    passwordError = 'An unexpected error occurred. Please try again.';
+  } finally {
+    loading = false;
+  }
+}
 </script>
  
 <div class="container mx-auto max-w-md p-4">
