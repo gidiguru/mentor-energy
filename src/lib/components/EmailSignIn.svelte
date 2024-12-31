@@ -1,6 +1,8 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
 
+    export let onForgotPassword: () => void;
+
     async function signup() {
         await goto('/signup');
     }
@@ -32,6 +34,13 @@
             <button type="button" class="btn variant-ghost-surface w-full" on:click={signup}>
                 Create an account
             </button>
+            <button 
+    type="button" 
+    class="btn variant-ghost-surface" 
+    on:click={onForgotPassword}
+>
+    Forgot Password?
+</button>
         </div>
     </form>
 </div>

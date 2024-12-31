@@ -2,7 +2,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
   
-    function handleRetry() {
+    function signin() {
       goto('/auth');
     }
 
@@ -17,24 +17,24 @@
       <h1 class="h2">Authentication Error</h1>
       
       <p class="text-lg">
-        This could either be because you do not have an account or you haven't confirmed it yet.
+        This could be because you used a wrong password...
+      </p>
+      <p class="text-lg">
+        ...Or you have not yet created an account or confirmed it in your email.
       </p>
       
       <ul class="list-disc text-left pl-6 space-y-2">
-        <li>Plesae signup to create an account</li>
+        <li>Please reset your password or signup to create an account</li>
         <li> If you already have, please check your email and confirm access</li>
       </ul>
   
       <div class="pt-4">
-        <button class="btn variant-filled-primary" on:click={handleRetry}>
-          Try Again
+        <button class="btn variant-filled-primary" on:click={signin}>
+          Sign In
         </button>
-      </div>
-
-      <div class="pt-4">
         <button class="btn variant-filled-primary" on:click={createAccount}>
-          Or Create a New Account
-        </button>
+            Create New Account
+          </button>
       </div>
   
       <p class="text-sm">
