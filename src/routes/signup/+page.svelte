@@ -100,6 +100,12 @@ function handleFormUpdate(event: CustomEvent) {
       existingUser: result.data?.existingUser || false
     };
 
+    if (result.data) {
+      formData.discipline = result.data.discipline || formData.discipline;
+      formData.qualification = result.data.qualification || formData.qualification;
+      formData.role = result.data.role || formData.role;
+    }
+
     // Check for existing user and set step accordingly
     if (form.existingUser) {
       existingUserEmail = form.email ?? null;
