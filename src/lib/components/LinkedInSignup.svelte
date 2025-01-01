@@ -27,7 +27,7 @@
       provider: 'linkedin_oidc',
       options: {
         scopes: 'openid profile email',
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `https://mentor.energy/auth/callback`,
         queryParams: {
           signup: 'true' // Add flag to identify this is a signup
         }
