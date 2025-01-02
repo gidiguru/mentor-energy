@@ -34,9 +34,9 @@
         <div>
           <h3 class="font-bold mb-3 md:mb-4">Legal</h3>
           <ul class="space-y-2">
-            <li><a href="/privacy">Privacy Policy</a></li>
-            <li><a href="/terms">Terms of Service</a></li>
-            <li><a href="/cookies">Cookie Policy</a></li>
+            <li><a href="/legal/privacy">Privacy Policy</a></li>
+            <li><a href="/legal/terms">Terms of Service</a></li>
+            <li><a href="/legal/cookies">Cookie Policy</a></li>
           </ul>
         </div>
       </div>

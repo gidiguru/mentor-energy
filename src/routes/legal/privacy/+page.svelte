@@ -75,7 +75,7 @@
     }
   </script>
   
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="max-w-4xl">
     <h1 class="h1 font-bold mb-6 text-center">Privacy Policy</h1>
     
     <div class="card variant-soft-surface p-4 mb-6 text-center">
