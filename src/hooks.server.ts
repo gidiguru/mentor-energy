@@ -62,7 +62,16 @@ const supabase: Handle = async ({ event, resolve }) => {
 }
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  
+  if (!event.locals.session && (
+    event.url.pathname.startsWith('/dashboard') || 
+    event.url.pathname.startsWith('/profile')
+  )) {
+    throw redirect(303, '/auth');
+  }
+
+  if (event.locals.session && event.url.pathname === '/auth') {
+    redirect(303, '/dashboard')
+  }
   // Special handling for callback first
   if (event.url.pathname === '/auth/callback') {
     const code = event.url.searchParams.get('code');
