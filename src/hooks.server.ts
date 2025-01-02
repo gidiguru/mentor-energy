@@ -4,19 +4,9 @@ import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 
 const supabase: Handle = async ({ event, resolve }) => {
-  /**
-   * Creates a Supabase client specific to this server request.
-   *
-   * The Supabase client gets the Auth token from the request cookies.
-   */
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => event.cookies.getAll(),
-      /**
-       * SvelteKit's cookies API requires `path` to be explicitly set in
-       * the cookie options. Setting `path` to `/` replicates previous/
-       * standard behavior.
-       */
       setAll: (cookiesToSet) => {
         cookiesToSet.forEach(({ name, value, options }) => {
           event.cookies.set(name, value, { ...options, path: '/' })
@@ -25,11 +15,6 @@ const supabase: Handle = async ({ event, resolve }) => {
     },
   })
 
-  /**
-   * Unlike `supabase.auth.getSession()`, which returns the session _without_
-   * validating the JWT, this function also calls `getUser()` to validate the
-   * JWT before returning the session.
-   */
   event.locals.safeGetSession = async () => {
     const {
       data: { session },
@@ -43,26 +28,45 @@ const supabase: Handle = async ({ event, resolve }) => {
       error,
     } = await event.locals.supabase.auth.getUser()
     if (error) {
-      // JWT validation has failed
       return { session: null, user: null }
     }
 
     return { session, user }
   }
 
-  return resolve(event, {
+  const response = await resolve(event, {
     filterSerializedResponseHeaders(name) {
-      /**
-       * Supabase libraries use the `content-range` and `x-supabase-api-version`
-       * headers, so we need to tell SvelteKit to pass it through.
-       */
       return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
+
+  // Add scroll-to-top behavior for HTML responses
+  if (response.headers.get('content-type')?.includes('text/html')) {
+    const html = await response.text()
+    const modifiedHtml = html.replace(
+      '</body>',
+      `<script>
+        window.addEventListener('sveltekit:navigation-end', () => {
+          window.scrollTo(0, 0);
+        });
+        window.addEventListener('load', () => {
+          window.scrollTo(0, 0);
+        });
+      </script>
+      </body>`
+    )
+    
+    return new Response(modifiedHtml, {
+      status: response.status,
+      headers: response.headers,
+    })
+  }
+
+  return response
 }
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  // Special handling for callback first
+  // Your existing authGuard code...
   if (event.url.pathname === '/auth/callback') {
     const code = event.url.searchParams.get('code');
     
