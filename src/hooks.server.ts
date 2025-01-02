@@ -4,9 +4,19 @@ import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 
 const supabase: Handle = async ({ event, resolve }) => {
+  /**
+   * Creates a Supabase client specific to this server request.
+   *
+   * The Supabase client gets the Auth token from the request cookies.
+   */
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => event.cookies.getAll(),
+      /**
+       * SvelteKit's cookies API requires `path` to be explicitly set in
+       * the cookie options. Setting `path` to `/` replicates previous/
+       * standard behavior.
+       */
       setAll: (cookiesToSet) => {
         cookiesToSet.forEach(({ name, value, options }) => {
           event.cookies.set(name, value, { ...options, path: '/' })
@@ -15,6 +25,11 @@ const supabase: Handle = async ({ event, resolve }) => {
     },
   })
 
+  /**
+   * Unlike `supabase.auth.getSession()`, which returns the session _without_
+   * validating the JWT, this function also calls `getUser()` to validate the
+   * JWT before returning the session.
+   */
   event.locals.safeGetSession = async () => {
     const {
       data: { session },
@@ -28,45 +43,27 @@ const supabase: Handle = async ({ event, resolve }) => {
       error,
     } = await event.locals.supabase.auth.getUser()
     if (error) {
+      // JWT validation has failed
       return { session: null, user: null }
     }
 
     return { session, user }
   }
 
-  const response = await resolve(event, {
+  return resolve(event, {
     filterSerializedResponseHeaders(name) {
+      /**
+       * Supabase libraries use the `content-range` and `x-supabase-api-version`
+       * headers, so we need to tell SvelteKit to pass it through.
+       */
       return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
-
-  // Add scroll-to-top behavior for HTML responses
-  if (response.headers.get('content-type')?.includes('text/html')) {
-    const html = await response.text()
-    const modifiedHtml = html.replace(
-      '</body>',
-      `<script>
-        window.addEventListener('sveltekit:navigation-end', () => {
-          window.scrollTo(0, 0);
-        });
-        window.addEventListener('load', () => {
-          window.scrollTo(0, 0);
-        });
-      </script>
-      </body>`
-    )
-    
-    return new Response(modifiedHtml, {
-      status: response.status,
-      headers: response.headers,
-    })
-  }
-
-  return response
 }
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  // Your existing authGuard code...
+  
+  // Special handling for callback first
   if (event.url.pathname === '/auth/callback') {
     const code = event.url.searchParams.get('code');
     
@@ -81,11 +78,22 @@ const authGuard: Handle = async ({ event, resolve }) => {
       if (data?.session) {
         const user = data.session.user;
         
+        // Extensive logging
+        console.log('OAuth User Full Data:', JSON.stringify({
+          id: user.id,
+          email: user.email,
+          userMetadata: user.user_metadata,
+          identities: user.identities
+        }, null, 2));
+
+        // Multiple methods to extract profile picture
         const profilePicture = 
           user.user_metadata?.picture || 
           user.user_metadata?.avatar_url || 
           user.identities?.[0]?.identity_data?.picture ||
           user.identities?.[0]?.identity_data?.avatar_url;
+
+        console.log('Extracted Profile Picture:', profilePicture);
 
         const { error: upsertError } = await event.locals.supabase
           .from('users')
@@ -110,27 +118,13 @@ const authGuard: Handle = async ({ event, resolve }) => {
           throw redirect(303, '/auth/error');
         }
 
+        // Set session before redirect
         event.locals.session = data.session;
         event.locals.user = data.session.user;
 
         throw redirect(303, '/auth/complete-signup');
       }
     }
-  }
-
-  const { session, user } = await event.locals.safeGetSession()
-  event.locals.session = session
-  event.locals.user = user
-
-  if (!event.locals.session && (
-    event.url.pathname.startsWith('/dashboard') || 
-    event.url.pathname.startsWith('/profile')
-  )) {
-    throw redirect(303, '/auth');
-  }
-
-  if (event.locals.session && event.url.pathname === '/auth') {
-    redirect(303, '/dashboard')
   }
 
   return resolve(event)
