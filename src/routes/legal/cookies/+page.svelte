@@ -2,8 +2,13 @@
     import { writable } from 'svelte/store';
   
     const lastUpdated = new Date('2025-01-01');
+
+    interface PolicySection {
+      title: string;
+      content: string[];
+    }
   
-    const cookiePolicySections = [
+    const cookiePolicySections: PolicySection[] = [
       {
         title: 'Essential Cookies',
         content: [
@@ -83,9 +88,9 @@
       }
     ];
   
-    const activeSection = writable(null);
+    const activeSection = writable<PolicySection | null>(null);
   
-    function toggleSection(section) {
+    function toggleSection(section: PolicySection) {
       activeSection.update(current => current === section ? null : section);
     }
   </script>

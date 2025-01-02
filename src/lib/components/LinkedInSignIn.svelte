@@ -36,5 +36,5 @@
     type="button"
    >
     <LinkedInIcon size={20} />
-    Sign up with LinkedIn
+    Sign In with LinkedIn
    </button>
