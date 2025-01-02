@@ -16,30 +16,28 @@
   const supabase = $page.data.supabase;
 
   try {
-    // First store the formData in localStorage before OAuth redirect
+    // Store formData and add profile picture flag
     localStorage.setItem('signupData', JSON.stringify({
       discipline: formData.discipline,
       qualification: formData.qualification,
-      role: formData.role
+      role: formData.role,
+      capture_profile_picture: true  // New flag to signal profile picture capture
     }));
 
     const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'linkedin_oidc',
-      options: {
-        scopes: 'openid profile email',
-        redirectTo: `https://mentor.energy/auth/callback`,
-        queryParams: {
-          signup: 'true' // Add flag to identify this is a signup
-        }
-      }
-    });
+          provider: 'linkedin_oidc',
+          options: {
+            skipBrowserRedirect: false,
+            redirectTo: new URL('/auth/callback', window.location.origin).toString()
+          }
+        });
+   
 
     if (error) throw error;
   } catch (error) {
     console.error('LinkedIn signup error:', error);
     dispatch('formUpdate', {
-      type: 'failure',
-     // error: error.message
+      type: 'failure'
     });
   }
 }

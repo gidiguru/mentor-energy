@@ -76,17 +76,29 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
       if (data?.session) {
         const user = data.session.user;
-        const metadata = user.user_metadata || {};
-
-        console.log('Auth callback - user data:', user);
         
+        const profilePicture = 
+          user.user_metadata?.picture || 
+          user.user_metadata?.avatar_url || 
+          user.identities?.[0]?.identity_data?.picture ||
+          user.identities?.[0]?.identity_data?.avatar_url;
+
         const { error: upsertError } = await event.locals.supabase
           .from('users')
           .upsert({
             id: user.id,
             email: user.email,
-            first_name: metadata.given_name || metadata.name?.split(' ')[0] || '',
-            last_name: metadata.family_name || metadata.name?.split(' ').slice(1).join(' ') || ''
+            first_name: 
+              user.user_metadata?.given_name || 
+              user.user_metadata?.name?.split(' ')[0] || 
+              user.identities?.[0]?.identity_data?.given_name || 
+              '',
+            last_name: 
+              user.user_metadata?.family_name || 
+              user.user_metadata?.name?.split(' ').slice(1).join(' ') || 
+              user.identities?.[0]?.identity_data?.family_name || 
+              '',
+            profile_picture: profilePicture
           });
 
         if (upsertError) {
@@ -94,7 +106,6 @@ const authGuard: Handle = async ({ event, resolve }) => {
           throw redirect(303, '/auth/error');
         }
 
-        // Set session before redirect
         event.locals.session = data.session;
         event.locals.user = data.session.user;
 
@@ -103,29 +114,19 @@ const authGuard: Handle = async ({ event, resolve }) => {
     }
   }
 
-  // Then handle regular session checks
-  const { session, user } = await event.locals.safeGetSession();
-  event.locals.session = session;
-  event.locals.user = user;
+  const { session, user } = await event.locals.safeGetSession()
+  event.locals.session = session
+  event.locals.user = user
 
-  // Protected routes check - but exclude complete-signup path
-  if (!event.locals.session && 
-      event.url.pathname.startsWith('/dashboard') || 
-      (event.url.pathname.startsWith('/profile'))) {
+  if (!event.locals.session && (
+    event.url.pathname.startsWith('/dashboard') || 
+    event.url.pathname.startsWith('/profile')
+  )) {
     throw redirect(303, '/auth');
   }
 
-  // Special handling for auth paths
-  if (event.url.pathname.startsWith('/auth')) {
-    // Allow access to complete-signup if coming from callback
-    if (event.url.pathname === '/auth/complete-signup' && event.locals.session) {
-      return resolve(event);
-    }
-
-    // Redirect to dashboard if already authenticated and not on complete-signup
-    if (event.locals.session && event.url.pathname !== '/auth/complete-signup') {
-      throw redirect(303, '/dashboard');
-    }
+  if (event.locals.session && event.url.pathname === '/auth') {
+    redirect(303, '/dashboard')
   }
 
   return resolve(event)

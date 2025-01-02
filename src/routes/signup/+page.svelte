@@ -24,6 +24,7 @@
     error?: string;
     message?: string;
     missing?: string;
+    profile_picture: string;
   }
 
 
@@ -35,7 +36,8 @@
     email: '',
     firstName: '',
     lastName: '',
-    password: ''
+    password: '',
+    profile_picture: '',
   };
 
   let existingUserEmail: string | null = null;

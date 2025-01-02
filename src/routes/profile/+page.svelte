@@ -1,52 +1,74 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import { page } from '$app/stores';
     import { onMount } from 'svelte';
 
-    export let data;
+    export let data: any;
 
-    let { supabase, session, user } = data;
+    let { supabase, session } = data;
     let profile: any = null;
-    let currentPassword = '';
+    let profilePictureUrl: string | null = null;
     let newPassword = '';
     let confirmPassword = '';
     let passwordError = '';
     let passwordSuccess = '';
 
-    const passwordRequirements = {
-      minLength: 8,
-      hasUpperCase: false, 
-      hasLowerCase: false,
-      hasNumber: false,
-      hasSpecial: false
+    $: passwordValidation = {
+        minLength: newPassword.length >= 8,
+        hasUpperCase: /[A-Z]/.test(newPassword),
+        hasLowerCase: /[a-z]/.test(newPassword),
+        hasNumber: /[0-9]/.test(newPassword),
+        hasSpecial: /[^A-Za-z0-9]/.test(newPassword)
     };
 
-    $: passwordStrength = validatePasswordStrength(newPassword);
-    
-    function validatePasswordStrength(pass: string) {
-      passwordRequirements.hasUpperCase = /[A-Z]/.test(pass);
-      passwordRequirements.hasLowerCase = /[a-z]/.test(pass);
-      passwordRequirements.hasNumber = /[0-9]/.test(pass);
-      passwordRequirements.hasSpecial = /[^A-Za-z0-9]/.test(pass);
-      return Object.values(passwordRequirements).filter(Boolean).length;
+    $: isPasswordValid = 
+        passwordValidation.minLength &&
+        passwordValidation.hasUpperCase &&
+        passwordValidation.hasLowerCase &&
+        passwordValidation.hasNumber &&
+        passwordValidation.hasSpecial &&
+        newPassword === confirmPassword;
+
+    function handleImageError(event: Event) {
+        const img = event.target as HTMLImageElement;
+        img.onerror = null;
+        img.src = defaultProfileIcon();
+        console.error('Profile picture failed to load:', profilePictureUrl);
     }
 
-    $: ({ supabase, session, user } = data);
+    function defaultProfileIcon() {
+        return `data:image/svg+xml,${encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-full h-full text-surface-500">
+                <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+            </svg>
+        `)}`;
+    }
 
     onMount(async () => {
-        if (session?.user) {
-            try {
-                const { data: profileData, error } = await supabase
-                    .from('users')
-                    .select('first_name, last_name, email, role, discipline, qualification')
-                    .eq('id', session.user.id)
-                    .single();
+        if (!session?.user) return;
 
-                if (error) throw error;
-                profile = profileData;
-            } catch (error) {
-                console.error('Error fetching profile:', error);
+        try {
+            const { data: profileData, error: profileError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profileError) throw profileError;
+
+            profile = profileData;
+            
+            // Validate and set profile picture
+            if (profile.profile_picture) {
+                // Check if it's a valid URL
+                try {
+                    new URL(profile.profile_picture);
+                    profilePictureUrl = profile.profile_picture;
+                } catch {
+                    console.error('Invalid profile picture URL:', profile.profile_picture);
+                    profilePictureUrl = null;
+                }
             }
+        } catch (error) {
+            console.error('Profile fetch error:', error);
         }
     });
 
@@ -54,19 +76,8 @@
         passwordError = '';
         passwordSuccess = '';
 
-        if (newPassword !== confirmPassword) {
-            passwordError = 'New passwords do not match';
-            return;
-        }
-
-        if (newPassword.length < 8) {
-            passwordError = 'Password must be at least 8 characters';
-            return;
-        }
-
-        const strength = validatePasswordStrength(newPassword);
-        if (strength < 3) {
-            passwordError = 'Password must include at least 3 of: uppercase, lowercase, number, special character';
+        if (!isPasswordValid) {
+            passwordError = 'Password does not meet all requirements';
             return;
         }
 
@@ -78,12 +89,11 @@
             if (error) throw error;
 
             passwordSuccess = 'Password updated successfully';
-            currentPassword = '';
             newPassword = '';
             confirmPassword = '';
         } catch (error) {
-            console.error('Error updating password:', error);
-            //passwordError = error.message || 'Error updating password';
+            console.error('Password update error:', error);
+            passwordError = 'Failed to update password';
         }
     }
 </script>
@@ -92,30 +102,47 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Profile Card -->
         <div class="card p-4 space-y-4">
-            <div class="flex justify-between items-center">
-                <h2 class="h2">Profile</h2>
+            <div class="flex flex-col items-center mb-6">
+                <!-- Profile Image Section -->
+                <div class="relative w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-surface-300">
+                    {#if profilePictureUrl}
+                        <img 
+                            src={profilePictureUrl} 
+                            alt="Profile" 
+                            class="w-full h-full object-cover"
+                            on:error={handleImageError}
+                        />
+                    {:else}
+                        <img 
+                            src={defaultProfileIcon()} 
+                            alt="Default Profile Icon" 
+                            class="w-full h-full object-cover text-surface-500"
+                        />
+                    {/if}
+                </div>
             </div>
-            
+
+            <!-- Profile Information -->
             {#if profile}
-            <div class="space-y-2">
+            <div class="space-y-3">
                 <div class="flex items-center space-x-2">
-                    <span class="font-bold">Name:</span>
+                    <span class="font-bold min-w-[100px]">Name:</span>
                     <span>{profile.first_name} {profile.last_name}</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="font-bold">Email:</span>
-                    <span>{profile.email}</span>
+                    <span class="font-bold min-w-[100px]">Email:</span>
+                    <span class="break-all">{profile.email}</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="font-bold">Role:</span>
+                    <span class="font-bold min-w-[100px]">Role:</span>
                     <span class="capitalize">{profile.role}</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="font-bold">Discipline:</span>
+                    <span class="font-bold min-w-[100px]">Discipline:</span>
                     <span class="capitalize">{profile.discipline}</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="font-bold">Qualification:</span>
+                    <span class="font-bold min-w-[100px]">Qualification:</span>
                     <span class="capitalize">{profile.qualification}</span>
                 </div>
             </div>
@@ -150,6 +177,24 @@
                     </div>
                 </div>
 
+                <div class="space-y-2 text-sm">
+                    <div class="{passwordValidation.minLength ? 'text-success-500' : 'text-error-500'}">
+                        ✓ At least 8 characters
+                    </div>
+                    <div class="{passwordValidation.hasUpperCase ? 'text-success-500' : 'text-error-500'}">
+                        ✓ One uppercase letter
+                    </div>
+                    <div class="{passwordValidation.hasLowerCase ? 'text-success-500' : 'text-error-500'}">
+                        ✓ One lowercase letter
+                    </div>
+                    <div class="{passwordValidation.hasNumber ? 'text-success-500' : 'text-error-500'}">
+                        ✓ One number
+                    </div>
+                    <div class="{passwordValidation.hasSpecial ? 'text-success-500' : 'text-error-500'}">
+                        ✓ One special character
+                    </div>
+                </div>
+
                 <div class="space-y-2">
                     <label for="confirmPassword">Confirm Password</label>
                     <input
@@ -159,6 +204,9 @@
                         class="input"
                         placeholder="Confirm new password"
                     />
+                    {#if confirmPassword && newPassword !== confirmPassword}
+                        <p class="text-error-500 text-sm">Passwords do not match</p>
+                    {/if}
                 </div>
 
                 {#if passwordError}
@@ -169,7 +217,11 @@
                     <div class="alert variant-filled-success">{passwordSuccess}</div>
                 {/if}
 
-                <button type="submit" class="btn variant-filled-primary w-full">
+                <button 
+                    type="submit" 
+                    class="btn variant-filled-primary w-full"
+                    disabled={!isPasswordValid}
+                >
                     Update Password
                 </button>
             </form>

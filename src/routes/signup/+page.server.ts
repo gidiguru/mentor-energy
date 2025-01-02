@@ -13,6 +13,7 @@ interface EmailSignupData extends BaseSignupData {
  password: string;
  firstName: string;
  lastName: string;
+ profile_picture: string;
 }
 
 interface LinkedInSignupData extends BaseSignupData {
@@ -27,7 +28,8 @@ function validateEmailSignup(formData: FormData): EmailSignupData {
     lastName: formData.get('lastName')?.toString().trim() || '',
     discipline: formData.get('discipline')?.toString().trim() || '',
     qualification: formData.get('qualification')?.toString().trim() || '',
-    role: formData.get('role')?.toString().trim() || ''
+    role: formData.get('role')?.toString().trim() || '',
+    profile_picture: formData.get('profile_picture')?.toString().trim() || ''
   };
  
   const requiredFields = ['email', 'password', 'firstName', 'lastName', 'discipline', 'qualification', 'role'] as const;
@@ -72,7 +74,8 @@ function validateLinkedInSignup(formData: FormData): BaseSignupData {
  const fields = {
    discipline: formData.get('discipline')?.toString().trim(),
    qualification: formData.get('qualification')?.toString().trim(),
-   role: formData.get('role')?.toString().trim()
+   role: formData.get('role')?.toString().trim(),
+   profile_picture: formData.get('profile_picture')?.toString().trim()
  };
 
  const requiredFields = ['discipline', 'qualification', 'role'] as const;
@@ -126,7 +129,8 @@ const { data: authData, error: signUpError } = await locals.supabase.auth.signUp
   options: {
     data: {
       first_name: userData.firstName,
-      last_name: userData.lastName
+      last_name: userData.lastName,
+      profile_picture: userData.profile_picture
     }
   }
 });
