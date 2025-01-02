@@ -16,7 +16,7 @@
           </ul>
         </div>
         <div>
-          <h3 class="font-bold mb-3 md:mb-4">For Students</h3>
+          <h3 class="font-bold mb-3 md:mb-4">For Mentees</h3>
           <ul class="space-y-2">
             <li><a href="/mentors">Find a Mentor</a></li>
             <li><a href="/resources">Resources</a></li>
