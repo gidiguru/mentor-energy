@@ -60,20 +60,20 @@
         if (uploadError) throw uploadError;
 
         // Get public URL
-        const { data } = supabase.storage
+        const { publicUrl } = supabase.storage
             .from('profile-pictures')
             .getPublicUrl(filePath);
 
         // Update user profile with new picture URL
         const { error: profileUpdateError } = await supabase
             .from('users')
-            .update({ profile_picture: data.publicUrl })
+            .update({ profile_picture: publicUrl })
             .eq('id', session.user.id);
 
         if (profileUpdateError) throw profileUpdateError;
 
         // Update local state
-        profilePictureUrl = data.publicUrl;
+        profilePictureUrl = publicUrl;
         imageFile = null;
     } catch (error) {
         console.error('Profile picture upload error:', error);

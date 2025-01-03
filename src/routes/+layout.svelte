@@ -3,11 +3,12 @@
   import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
   import { storePopup, initializeStores } from '@skeletonlabs/skeleton';
   import { invalidate, afterNavigate } from '$app/navigation';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
   import type { SupabaseClient, Session } from '@supabase/supabase-js';
   import { browser } from '$app/environment';
-  import { navigating } from '$app/stores';
+  import { navigating, page } from '$app/stores';
+  import { auth } from '$lib/stores/auth';
   import '../app.postcss';
 
   // Components
@@ -27,12 +28,19 @@
   // Initialize stores
   initializeStores();
   const isDarkMode: Writable<boolean> = writable(false);
+  let unsubscribeRoute: () => void;
 
   // Handle auth state changes
   function setupAuthStateListener(supabase: SupabaseClient, currentSession: Session | null) {
-    const { data: authData } = supabase.auth.onAuthStateChange((_, newSession) => {
+    const { data: authData } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (newSession?.expires_at !== currentSession?.expires_at) {
         invalidate('supabase:auth');
+      }
+      
+      if (event === 'SIGNED_OUT') {
+        auth.clearUser();
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        auth.initialize(newSession);
       }
     });
 
@@ -70,24 +78,20 @@
     });
   }
 
-    // Scroll to Top
-    function forceScrollToTop() {
+  // Scroll to Top
+  function forceScrollToTop() {
     console.log('Force scroll to top called');
     
-    // Multiple methods to ensure scrolling
     if (browser) {
-      // Method 1: window.scrollTo
       window.scrollTo({
         top: 0,
         left: 0,
         behavior: 'instant'
       });
 
-      // Method 2: document.body scroll
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
 
-      // Method 3: Scroll container if exists
       const mainContainer = document.querySelector('main') || document.body;
       mainContainer.scrollTop = 0;
 
@@ -98,12 +102,25 @@
     }
   }
 
-    // Multiple triggers for scroll reset
-    $: if (browser && $navigating === null) {
+  // Multiple triggers for scroll reset
+  $: if (browser && $navigating === null) {
     forceScrollToTop();
   }
 
   onMount(() => {
+    // Initialize auth state
+    auth.initialize(data.session);
+
+    // Subscribe to page changes for client-side route protection
+    unsubscribeRoute = page.subscribe(() => {
+      auth.guardRoute();
+    });
+
+    // Set up other listeners and observers
+    const unsubscribeAuth = setupAuthStateListener(data.supabase, data.session);
+    const unsubscribeDarkMode = setupDarkModeObserver();
+    setupFloatingUI();
+
     // Additional mount-time scroll reset
     forceScrollToTop();
 
@@ -113,23 +130,19 @@
     };
 
     window.addEventListener('popstate', handleNavigation);
-    return () => {
-      window.removeEventListener('popstate', handleNavigation);
-    };
-  });
-  
-  onMount(() => {
-    const unsubscribeAuth = setupAuthStateListener(data.supabase, data.session);
-    const unsubscribeDarkMode = setupDarkModeObserver();
-    setupFloatingUI();
-
+    
     return () => {
       unsubscribeAuth();
       unsubscribeDarkMode();
+      window.removeEventListener('popstate', handleNavigation);
     };
   });
-  
-  
+
+  onDestroy(() => {
+    if (unsubscribeRoute) {
+      unsubscribeRoute();
+    }
+  });
 </script>
 
 <Toast />
