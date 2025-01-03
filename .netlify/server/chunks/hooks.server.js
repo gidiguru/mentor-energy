@@ -72,6 +72,21 @@ const authGuard = async ({ event, resolve }) => {
         throw redirect(303, "/auth/error");
       }
       if (data?.session) {
+        const user2 = data.session.user;
+        const profilePicture = user2.user_metadata?.picture || user2.user_metadata?.avatar_url || user2.identities?.[0]?.identity_data?.picture || user2.identities?.[0]?.identity_data?.avatar_url;
+        const { error: upsertError } = await event.locals.supabase.from("users").upsert({
+          id: user2.id,
+          email: user2.email,
+          first_name: user2.user_metadata?.given_name || user2.user_metadata?.name?.split(" ")[0] || user2.identities?.[0]?.identity_data?.given_name || "",
+          last_name: user2.user_metadata?.family_name || user2.user_metadata?.name?.split(" ").slice(1).join(" ") || user2.identities?.[0]?.identity_data?.family_name || "",
+          profile_picture: profilePicture
+        });
+        if (upsertError) {
+          console.error("Error updating user data:", upsertError);
+          throw redirect(303, "/auth/error");
+        }
+        event.locals.session = data.session;
+        event.locals.user = data.session.user;
         throw redirect(303, "/auth/complete-signup");
       }
     }
