@@ -36,19 +36,11 @@ function createAuthStore() {
             loading 
         })),
         initialize: (session: any) => {
-            if (session?.user) {
-                update(state => ({
-                    ...state,
-                    isAuthenticated: true,
-                    loading: false
-                }));
-            } else {
-                update(state => ({
-                    ...state,
-                    isAuthenticated: false,
-                    loading: false
-                }));
-            }
+            update(state => ({
+                ...state,
+                isAuthenticated: !!session,
+                loading: false
+            }));
         },
         guardRoute: async () => {
             const $page = get(page);
@@ -60,7 +52,13 @@ function createAuthStore() {
             );
 
             if (!state.isAuthenticated && !state.loading && isProtectedRoute) {
-                goto(`/auth?redirectTo=${encodeURIComponent($page.url.pathname)}`);
+                // Remove any existing redirectTo to prevent loops
+                const currentPath = $page.url.pathname;
+                if (!currentPath.includes('/auth')) {
+                    goto(`/auth?redirectTo=${encodeURIComponent(currentPath)}`);
+                } else {
+                    goto('/auth');
+                }
                 return false;
             }
 

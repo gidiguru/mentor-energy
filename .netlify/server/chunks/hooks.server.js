@@ -1,6 +1,6 @@
 import { P as PUBLIC_SUPABASE_URL, a as PUBLIC_SUPABASE_ANON_KEY } from "./public.js";
 import { createServerClient } from "@supabase/ssr";
-import { r as redirect, e as error } from "./index.js";
+import { r as redirect } from "./index.js";
 function sequence(...handlers) {
   const length = handlers.length;
   if (!length) return ({ event, resolve }) => resolve(event);
@@ -72,12 +72,7 @@ const authGuard = async ({ event, resolve }) => {
         throw redirect(303, "/auth/error");
       }
       if (data?.session) {
-        const signupData = event.url.searchParams.get("signupData");
-        if (signupData) {
-          throw redirect(303, "/auth/complete-signup");
-        } else {
-          throw redirect(303, "/dashboard");
-        }
+        throw redirect(303, "/auth/complete-signup");
       }
     }
   }
@@ -89,21 +84,12 @@ const authGuard = async ({ event, resolve }) => {
     (route) => event.url.pathname.startsWith(route)
   );
   if (!session && isProtectedRoute) {
-    throw redirect(303, `/auth?redirectTo=${encodeURIComponent(event.url.pathname)}`);
+    throw redirect(303, "/auth/complete-signup");
   }
   if (session && event.url.pathname === "/auth") {
-    throw redirect(303, "/dashboard");
+    throw redirect(303, "/auth/complete-signup");
   }
-  try {
-    const response = await resolve(event);
-    return response;
-  } catch (err) {
-    if (err instanceof redirect) {
-      throw err;
-    }
-    console.error("Error in auth guard:", err);
-    throw error(500, "Internal server error");
-  }
+  return resolve(event);
 };
 const handle = sequence(supabase, authGuard);
 export {

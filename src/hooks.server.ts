@@ -52,21 +52,12 @@ const authGuard: Handle = async ({ event, resolve }) => {
       }
 
       if (data?.session) {
-        // Get signup data from URL if it exists
-        const signupData = event.url.searchParams.get('signupData');
-        
-        if (signupData) {
-          // Handle new signup flow
-          throw redirect(303, '/auth/complete-signup');
-        } else {
-          // Regular sign in - redirect to dashboard
-          throw redirect(303, '/dashboard');
-        }
+        // Always redirect to complete-signup after successful authentication
+        throw redirect(303, '/auth/complete-signup');
       }
     }
   }
 
-  // Handle regular auth state
   const { session, user } = await event.locals.safeGetSession();
   event.locals.session = session;
   event.locals.user = user;
@@ -78,24 +69,15 @@ const authGuard: Handle = async ({ event, resolve }) => {
   );
 
   if (!session && isProtectedRoute) {
-    throw redirect(303, `/auth?redirectTo=${encodeURIComponent(event.url.pathname)}`);
+    throw redirect(303, '/auth/complete-signup');
   }
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users to complete-signup
   if (session && event.url.pathname === '/auth') {
-    throw redirect(303, '/dashboard');
+    throw redirect(303, '/auth/complete-signup');
   }
 
-  try {
-    const response = await resolve(event);
-    return response;
-  } catch (err) {
-    if (err instanceof redirect) {
-      throw err;
-    }
-    console.error('Error in auth guard:', err);
-    throw error(500, 'Internal server error');
-  }
+  return resolve(event);
 };
 
 export const handle: Handle = sequence(supabase, authGuard)

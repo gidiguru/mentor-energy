@@ -49,12 +49,6 @@ class ActionFailure {
     this.data = data;
   }
 }
-function error(status, body) {
-  if (isNaN(status) || status < 400 || status > 599) {
-    throw new Error(`HTTP error status codes must be between 400 and 599 — ${status} is invalid`);
-  }
-  throw new HttpError(status, body);
-}
 function redirect(status, location) {
   if (isNaN(status) || status < 300 || status > 308) {
     throw new Error("Invalid status code");
@@ -103,7 +97,6 @@ export {
   HttpError as H,
   Redirect as R,
   SvelteKitError as S,
-  error as e,
   fail as f,
   json as j,
   redirect as r,
