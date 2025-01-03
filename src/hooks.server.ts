@@ -52,6 +52,40 @@ const authGuard: Handle = async ({ event, resolve }) => {
       }
 
       if (data?.session) {
+        const user = data.session.user;
+        
+        const profilePicture = 
+          user.user_metadata?.picture || 
+          user.user_metadata?.avatar_url || 
+          user.identities?.[0]?.identity_data?.picture ||
+          user.identities?.[0]?.identity_data?.avatar_url;
+
+        const { error: upsertError } = await event.locals.supabase
+          .from('users')
+          .upsert({
+            id: user.id,
+            email: user.email,
+            first_name: 
+              user.user_metadata?.given_name || 
+              user.user_metadata?.name?.split(' ')[0] || 
+              user.identities?.[0]?.identity_data?.given_name || 
+              '',
+            last_name: 
+              user.user_metadata?.family_name || 
+              user.user_metadata?.name?.split(' ').slice(1).join(' ') || 
+              user.identities?.[0]?.identity_data?.family_name || 
+              '',
+            profile_picture: profilePicture
+          });
+
+        if (upsertError) {
+          console.error('Error updating user data:', upsertError);
+          throw redirect(303, '/auth/error');
+        }
+
+        event.locals.session = data.session;
+        event.locals.user = data.session.user;
+
         // Always redirect to complete-signup after successful authentication
         throw redirect(303, '/auth/complete-signup');
       }
