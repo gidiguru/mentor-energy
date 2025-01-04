@@ -130,7 +130,10 @@ const { data: authData, error: signUpError } = await locals.supabase.auth.signUp
     data: {
       first_name: userData.firstName,
       last_name: userData.lastName,
-      profile_picture: userData.profile_picture
+      profile_picture: userData.profile_picture,
+      discipline: userData.discipline,
+      qualification: userData.qualification,
+      role: userData.role,
     }
   }
 });
@@ -176,7 +179,9 @@ const { data: profileData, error: profileError } = await locals.supabase
    last_name: userData.lastName,
    discipline: userData.discipline, 
    qualification: userData.qualification,
-   role: userData.role
+   role: userData.role,
+   profile_picture: userData.profile_picture,
+   signup_completed: true
  })
  .eq('id', authData.user.id)
  .select()
