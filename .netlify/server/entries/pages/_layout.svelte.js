@@ -1,5 +1,6 @@
-import { h as setContext, g as getContext, i as get_store_value, j as split_css_unit, c as create_ssr_component, e as escape, b as add_attribute, k as compute_slots, l as add_styles, s as subscribe, a as each, v as validate_component, o as onDestroy } from "../../chunks/ssr.js";
-import { w as writable, r as readable } from "../../chunks/index2.js";
+import { i as setContext, g as getContext, j as split_css_unit, c as create_ssr_component, e as escape, b as add_attribute, k as compute_slots, l as add_styles, s as subscribe, a as each, v as validate_component, o as onDestroy } from "../../chunks/ssr.js";
+import { w as writable } from "../../chunks/index2.js";
+import { m as modeCurrent, s as setInitialClassState, p as prefersReducedMotionStore } from "../../chunks/ProgressBar.svelte_svelte_type_style_lang.js";
 import "../../chunks/client.js";
 import { p as page, n as navigating } from "../../chunks/stores.js";
 const DRAWER_STORE_KEY = "drawerStore";
@@ -134,44 +135,6 @@ function initializeStores() {
   initializeToastStore();
   initializeDrawerStore();
 }
-const stores = {};
-function localStorageStore(key, initialValue, options) {
-  if (!stores[key]) {
-    const store = writable(initialValue, (set2) => {
-    });
-    const { subscribe: subscribe2, set } = store;
-    stores[key] = {
-      set(value) {
-        set(value);
-      },
-      update(updater) {
-        const value = updater(get_store_value(store));
-        set(value);
-      },
-      subscribe: subscribe2
-    };
-  }
-  return stores[key];
-}
-localStorageStore("modeOsPrefers", false);
-localStorageStore("modeUserPrefers", void 0);
-const modeCurrent = localStorageStore("modeCurrent", false);
-function setInitialClassState() {
-  const elemHtmlClasses = document.documentElement.classList;
-  const condLocalStorageUserPrefs = localStorage.getItem("modeUserPrefers") === "false";
-  const condLocalStorageUserPrefsExists = !("modeUserPrefers" in localStorage);
-  const condMatchMedia = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  if (condLocalStorageUserPrefs || condLocalStorageUserPrefsExists && condMatchMedia) {
-    elemHtmlClasses.add("dark");
-  } else {
-    elemHtmlClasses.remove("dark");
-  }
-}
-function prefersReducedMotion() {
-  return false;
-}
-const prefersReducedMotionStore = readable(prefersReducedMotion(), (set) => {
-});
 function cubicOut(t) {
   const f = t - 1;
   return f * f * f + 1;
@@ -433,6 +396,13 @@ const Toast = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     return `<div${add_attribute("role", t.hideDismiss ? "alert" : "alertdialog", 0)} aria-live="polite"> <div class="${"toast " + escape(classesToast, true) + " " + escape(t.background ?? background, true) + " " + escape(t.classes ?? "", true)}" data-testid="toast"><div class="text-base"><!-- HTML_TAG_START -->${t.message}<!-- HTML_TAG_END --></div> ${t.action || !t.hideDismiss ? `<div class="${"toast-actions " + escape(cToastActions, true)}">${t.action ? `<button${add_attribute("class", buttonAction, 0)}><!-- HTML_TAG_START -->${t.action.label}<!-- HTML_TAG_END --></button>` : ``} ${!t.hideDismiss ? `<button${add_attribute("class", buttonDismiss, 0)} aria-label="Dismiss toast">${escape(buttonDismissLabel)}</button>` : ``} </div>` : ``}</div> </div>`;
   })}</div></div>` : ``}`;
 });
+function defaultProfileIcon() {
+  return `data:image/svg+xml,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653Zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438ZM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0Z" clip-rule="evenodd" />
+      </svg>
+    `)}`;
+}
 const Header = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $page, $$unsubscribe_page;
   $$unsubscribe_page = subscribe(page, (value) => $page = value);
@@ -444,8 +414,7 @@ const Header = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     { href: "/", label: "Home" },
     { href: "/dashboard", label: "Dashboard" },
     { href: "/mentors", label: "Find Mentors" },
-    { href: "/resources", label: "Resources" },
-    { href: "/profile", label: "Profile" }
+    { href: "/resources", label: "Resources" }
   ];
   if ($$props.isDarkMode === void 0 && $$bindings.isDarkMode && isDarkMode !== void 0) $$bindings.isDarkMode(isDarkMode);
   if ($$props.supabase === void 0 && $$bindings.supabase && supabase !== void 0) $$bindings.supabase(supabase);
@@ -458,7 +427,7 @@ const Header = create_ssr_component(($$result, $$props, $$bindings, slots) => {
           $page.url.pathname === item.href ? "text-primary-500" : "",
           true
         )}">${escape(item.label)} </a>`;
-      })}</nav> <div class="flex items-center space-x-4">${validate_component(LightSwitch, "LightSwitch").$$render($$result, {}, {}, {})} <button type="button" class="btn variant-ghost-surface md:hidden" data-svelte-h="svelte-10s9ij3"><span class="text-2xl">☰</span></button> ${session ? `<button class="btn variant-filled-error" data-svelte-h="svelte-chozxu">Sign Out</button>` : `<a href="/auth" class="btn variant-filled-primary" data-svelte-h="svelte-1ble8fj">Sign In</a>`}</div> `;
+      })}</nav> <div class="flex items-center gap-4">${session ? `<div class="flex items-center gap-2"><a href="/profile" class="flex items-center gap-2 hover:text-primary-500 transition-colors">${`<div class="w-8 h-8 rounded-full bg-surface-300-600-token border-2 border-surface-500"><img${add_attribute("src", defaultProfileIcon(), 0)} alt="Default Profile" class="w-full h-full"></div>`} <span class="hidden md:inline">${escape("Profile")}</span></a></div>` : ``} <div class="flex items-center space-x-4">${validate_component(LightSwitch, "LightSwitch").$$render($$result, {}, {}, {})} <button type="button" class="btn variant-ghost-surface md:hidden" data-svelte-h="svelte-1snhz2n"><span class="text-2xl">☰</span></button> ${session ? `<button class="btn variant-filled-error" data-svelte-h="svelte-chozxu">Sign Out</button>` : `<a href="/auth" class="btn variant-filled-primary" data-svelte-h="svelte-1ble8fj">Sign In</a>`}</div></div> `;
     },
     lead: () => {
       return `<a href="/" class="flex items-center space-x-2"><img${add_attribute(

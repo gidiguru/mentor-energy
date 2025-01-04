@@ -15,6 +15,17 @@
       "_ssr.js"
     ]
   },
+  "_ProgressBar.svelte_svelte_type_style_lang.js": {
+    "file": "chunks/ProgressBar.svelte_svelte_type_style_lang.js",
+    "name": "ProgressBar.svelte_svelte_type_style_lang",
+    "imports": [
+      "_index2.js",
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/ProgressBar.c6i8ireL.css"
+    ]
+  },
   "_client.js": {
     "file": "chunks/client.js",
     "name": "client",
@@ -124,11 +135,12 @@
     "imports": [
       "_ssr.js",
       "_index2.js",
+      "_ProgressBar.svelte_svelte_type_style_lang.js",
       "_client.js",
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DAOhuKLL.css"
+      "_app/immutable/assets/_layout.Degelq7S.css"
     ]
   },
   "src/routes/+layout.ts": {
@@ -166,6 +178,15 @@
     "isEntry": true,
     "imports": [
       "_ssr.js"
+    ]
+  },
+  "src/routes/api/learning/complete-module/+server.ts": {
+    "file": "entries/endpoints/api/learning/complete-module/_server.ts.js",
+    "name": "entries/endpoints/api/learning/complete-module/_server.ts",
+    "src": "src/routes/api/learning/complete-module/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
     ]
   },
   "src/routes/auth/+layout.svelte": {
@@ -333,7 +354,25 @@
     "file": "entries/pages/dashboard/_layout.server.ts.js",
     "name": "entries/pages/dashboard/_layout.server.ts",
     "src": "src/routes/dashboard/+layout.server.ts",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/dashboard/+layout.svelte": {
+    "file": "entries/pages/dashboard/_layout.svelte.js",
+    "name": "entries/pages/dashboard/_layout.svelte",
+    "src": "src/routes/dashboard/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_client.js",
+      "_index2.js",
+      "_ProgressBar.svelte_svelte_type_style_lang.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.DUuB39r-.css"
+    ]
   },
   "src/routes/dashboard/+page.server.ts": {
     "file": "entries/pages/dashboard/_page.server.ts.js",
@@ -345,6 +384,83 @@
     "file": "entries/pages/dashboard/_page.svelte.js",
     "name": "entries/pages/dashboard/_page.svelte",
     "src": "src/routes/dashboard/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.C0es91vZ.css"
+    ]
+  },
+  "src/routes/dashboard/learning/+layout.svelte": {
+    "file": "entries/pages/dashboard/learning/_layout.svelte.js",
+    "name": "entries/pages/dashboard/learning/_layout.svelte",
+    "src": "src/routes/dashboard/learning/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ]
+  },
+  "src/routes/dashboard/learning/+page.svelte": {
+    "file": "entries/pages/dashboard/learning/_page.svelte.js",
+    "name": "entries/pages/dashboard/learning/_page.svelte",
+    "src": "src/routes/dashboard/learning/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.ApciN1GP.css"
+    ]
+  },
+  "src/routes/dashboard/learning/modules/+page.svelte": {
+    "file": "entries/pages/dashboard/learning/modules/_page.svelte.js",
+    "name": "entries/pages/dashboard/learning/modules/_page.svelte",
+    "src": "src/routes/dashboard/learning/modules/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_client.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.Dk06gNHp.css"
+    ]
+  },
+  "src/routes/dashboard/learning/modules/[moduleId]/+layout.svelte": {
+    "file": "entries/pages/dashboard/learning/modules/_moduleId_/_layout.svelte.js",
+    "name": "entries/pages/dashboard/learning/modules/_moduleId_/_layout.svelte",
+    "src": "src/routes/dashboard/learning/modules/[moduleId]/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ]
+  },
+  "src/routes/dashboard/learning/modules/[moduleId]/+page.server.ts": {
+    "file": "entries/pages/dashboard/learning/modules/_moduleId_/_page.server.ts.js",
+    "name": "entries/pages/dashboard/learning/modules/_moduleId_/_page.server.ts",
+    "src": "src/routes/dashboard/learning/modules/[moduleId]/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/dashboard/learning/modules/[moduleId]/+page.svelte": {
+    "file": "entries/pages/dashboard/learning/modules/_moduleId_/_page.svelte.js",
+    "name": "entries/pages/dashboard/learning/modules/_moduleId_/_page.svelte",
+    "src": "src/routes/dashboard/learning/modules/[moduleId]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_ProgressBar.svelte_svelte_type_style_lang.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.ApciN1GP.css"
+    ]
+  },
+  "src/routes/dashboard/profile/+page.svelte": {
+    "file": "entries/pages/dashboard/profile/_page.svelte.js",
+    "name": "entries/pages/dashboard/profile/_page.svelte",
+    "src": "src/routes/dashboard/profile/+page.svelte",
     "isEntry": true,
     "imports": [
       "_ssr.js",

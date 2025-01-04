@@ -1,10 +1,8 @@
-import * as server from '../entries/pages/private/_layout.server.ts.js';
+
 
 export const index = 5;
 let component_cache;
-export const component = async () => component_cache ??= (await import('../entries/pages/private/_layout.svelte.js')).default;
-export { server };
-export const server_id = "src/routes/private/+layout.server.ts";
-export const imports = ["_app/immutable/nodes/5.DDuw1Na4.js","_app/immutable/chunks/scheduler.DnE5Ux84.js","_app/immutable/chunks/index.DUhc_Oi1.js","_app/immutable/chunks/stores.vGeInHSN.js","_app/immutable/chunks/entry.CFKdJtq4.js","_app/immutable/chunks/index.BOZ2xkje.js","_app/immutable/chunks/index.zCkZVI4I.js"];
-export const stylesheets = ["_app/immutable/assets/5.D8rPqgA6.css"];
+export const component = async () => component_cache ??= (await import('../entries/pages/dashboard/learning/modules/_moduleId_/_layout.svelte.js')).default;
+export const imports = ["_app/immutable/nodes/5.Ik8xbVt5.js","_app/immutable/chunks/scheduler.SkWvRp4G.js","_app/immutable/chunks/index.GshdcV3z.js"];
+export const stylesheets = [];
 export const fonts = [];
