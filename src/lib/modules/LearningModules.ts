@@ -1,101 +1,77 @@
-interface TextContent {
+export interface ModuleContent {
     id: string;
-    type: 'text';
-    content: string;
+    type: 'text' | 'mcq';
+    content?: string;
+    question?: string;
+    options?: string[];
+    correctAnswer?: string;
+    correctFeedback?: string;
+    incorrectFeedback?: string;
   }
   
-  interface MCQContent {
-    id: string;
-    type: 'mcq';
-    question: string;
-    options: string[];
-    correctAnswer: string;
-    correctFeedback: string;
-    incorrectFeedback: string;
+  export interface LearningModuleInterface {
+    currentStep: number;
+    totalSteps: number;
+    getCurrentContent: () => ModuleContent;
+    isLastStep: () => boolean;
+    handleAnswer: (itemId: string, answer: string) => void;
+    handleNext: () => void;
+    handleRetry: () => void;
+    showFeedback: boolean;
+    isCorrect: boolean;
+    userAnswers: Record<string, string>;
   }
   
-  type ModuleContent = TextContent | MCQContent;
+  export function LearningModule(): LearningModuleInterface {
+    const moduleContent: ModuleContent[] = [
+      {
+        id: 'intro',
+        type: 'text',
+        content: 'Welcome to Introduction to Petroleum Geology...'
+      },
+      // Add more content items...
+    ];
   
-  const moduleContent: ModuleContent[] = [
-    {
-      id: '1',
-      type: 'text',
-      content: 'Welcome to the Introduction to Petroleum Geology module.'
-    },
-    {
-      id: '2',
-      type: 'mcq',
-      question: 'Which of the following is NOT a type of hydrocarbon trap?',
-      options: [
-        'Structural trap',
-        'Stratigraphic trap',
-        'Crystalline trap',
-        'Combination trap'
-      ],
-      correctAnswer: 'Crystalline trap',
-      correctFeedback: 'Correct! Crystalline trap is not a real type of hydrocarbon trap.',
-      incorrectFeedback: 'That\'s not correct. Review the types of hydrocarbon traps.'
-    },
-    {
-      id: '3',
-      type: 'mcq',
-      question: 'What is the primary source rock for most petroleum deposits?',
-      options: [
-        'Sandstone',
-        'Shale',
-        'Limestone',
-        'Granite'
-      ],
-      correctAnswer: 'Shale',
-      correctFeedback: 'Correct! Shale is the most common source rock.',
-      incorrectFeedback: 'Not quite. Consider the organic content of different rocks.'
-    }
-  ];
-  
-  function getTextContent(content: ModuleContent): content is TextContent {
-    return content.type === 'text';
-  }
-  
-  function getMCQContent(content: ModuleContent): content is MCQContent {
-    return content.type === 'mcq';
-  }
-  
-  function LearningModule() {
     let currentStep = 0;
-    let userAnswers: Record<string, string> = {};
     let showFeedback = false;
     let isCorrect = false;
-  
-    function handleAnswer(itemId: string, answer: string) {
-      userAnswers[itemId] = answer;
-      const currentContent = moduleContent[currentStep];
-      
-      if (getMCQContent(currentContent)) {
-        isCorrect = answer === currentContent.correctAnswer;
-        showFeedback = true;
-      }
-    }
-  
-    function handleNext() {
-      if (currentStep < moduleContent.length - 1) {
-        currentStep++;
-        showFeedback = false;
-      }
-    }
+    const userAnswers: Record<string, string> = {};
   
     return {
-      getCurrentContent(): ModuleContent {
-        return moduleContent[currentStep];
+      currentStep,
+      totalSteps: moduleContent.length,
+  
+      getCurrentContent: () => moduleContent[currentStep],
+  
+      isLastStep: () => currentStep === moduleContent.length - 1,
+  
+      handleAnswer: (itemId: string, answer: string) => {
+        userAnswers[itemId] = answer;
+        isCorrect = answer === moduleContent[currentStep].correctAnswer;
+        showFeedback = true;
       },
-      isLastStep(): boolean {
-        return currentStep === moduleContent.length - 1;
+  
+      handleNext: () => {
+        if (currentStep < moduleContent.length - 1) {
+          currentStep++;
+          showFeedback = false;
+        }
       },
-      handleAnswer,
-      handleNext,
-      showFeedback,
-      isCorrect,
-      userAnswers
+  
+      handleRetry: () => {
+        showFeedback = false;
+      },
+  
+      get showFeedback() {
+        return showFeedback;
+      },
+  
+      get isCorrect() {
+        return isCorrect;
+      },
+  
+      get userAnswers() {
+        return userAnswers;
+      }
     };
   }
-  
-  export { LearningModule, type ModuleContent, type TextContent, type MCQContent };

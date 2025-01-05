@@ -6,6 +6,7 @@
     import { writable } from 'svelte/store';
     import { slide } from 'svelte/transition';
     import type { LayoutData } from './$types';
+    import { clickOutside } from '$lib/actions/clickOutside';
     
     export let data: LayoutData;
     let { supabase, session, user, profile } = data;
@@ -14,6 +15,8 @@
     let isNavOpen = false;
     let isMobile = false;
     let expandedItem: string | null = null;
+
+    let mobileNavRef: HTMLElement;
  
     const navItems = [
       { path: '/dashboard', label: 'Overview', icon: '🏠' },
@@ -66,7 +69,7 @@
     });
  
     function checkMobile() {
-      isMobile = window.innerWidth < 640;
+      isMobile = window.innerWidth < 768; // Changed to md breakpoint
       if (!isMobile) isNavOpen = false;
     }
  
@@ -89,13 +92,17 @@
         goto('/');
       }
     }
- </script>
- 
- <div class="flex h-screen">
+
+    function handleClickOutside(event: CustomEvent) {
+    isNavOpen = false;
+  }
+</script>
+
+<div class="h-screen flex flex-col md:flex-row">
     <!-- Desktop Sidebar -->
     {#if !isMobile}
-        <aside class="w-64 bg-surface-100-800-token border-r border-surface-500/30 p-4 hidden sm:block">
-            <div class="flex flex-col gap-2">
+        <aside class="w-64 bg-surface-100-800-token border-r border-surface-500/30 p-4 h-full overflow-y-auto">
+            <div class="flex flex-col gap-2 h-full">
                 {#each navItems as item}
                     <div class="w-full">
                         <button 
@@ -146,7 +153,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Mobile Header -->
         {#if isMobile}
-            <header class="bg-surface-100-800-token border-b border-surface-500/30 p-4">
+            <header class="bg-surface-100-800-token border-b border-surface-500/30 p-4 sticky top-0 z-50">
                 <button 
                     class="btn variant-filled-primary w-full flex items-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
                     on:click={toggleNav}
@@ -158,7 +165,12 @@
  
                 {#if isNavOpen}
                     <nav 
-                        class="absolute z-50 left-4 right-4 mt-3 bg-surface-50-900-token rounded-xl shadow-2xl border-2 border-primary-500"
+                    role="dialog"
+                    aria-modal="true"
+                    bind:this={mobileNavRef}
+                    use:clickOutside
+                    on:clickOutside={handleClickOutside}  
+                    class="fixed inset-x-4 mt-3 bg-surface-50-900-token rounded-xl shadow-2xl border-2 border-primary-500 max-h-[80vh] overflow-y-auto"
                         transition:slide={{duration: 200}}
                     >
                         {#each navItems as item}
@@ -213,9 +225,9 @@
             <slot />
         </main>
     </div>
- </div>
+</div>
  
- <style lang="postcss">
+<style lang="postcss">
     :global(.app-bar) {
         @apply shadow-none;
     }
@@ -227,4 +239,4 @@
     nav button {
         @apply border-b border-surface-500/30 last:border-none rounded-none first:rounded-t-lg last:rounded-b-lg;
     }
- </style>
+</style>
