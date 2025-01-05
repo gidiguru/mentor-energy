@@ -22,7 +22,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
     // Get user's progress stats
     const { data: stats, error: statsError } = await locals.supabase
-      .from('user_progress')
+      .from('module_progress')
       .select('*')
       .eq('user_id', session.user.id);
 
