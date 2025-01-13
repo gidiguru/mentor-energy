@@ -1,15 +1,20 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import type { PageData } from './$types';
 
-  export let data: PageData;
-  let { module, progress, moduleId } = data;
 
-  $: completionPercentage = progress?.completion_percentage || 0;
-  $: objectives = typeof module?.learning_objectives === 'string' 
-    ? module.learning_objectives.split('\n') 
-    : Array.isArray(module?.learning_objectives) 
-      ? module.learning_objectives 
-      : [];
+  export let data: PageData;
+  
+  // Destructure with type safety
+  $: module = data.module;
+  $: progress = data.progress;
+  $: moduleId = data.moduleId;
+
+  // Parse learning objectives safely
+
+
+  // Calculate completion percentage
+  $: completionPercentage = progress?.progress || 0;
 </script>
 
 <div class="space-y-6">
@@ -19,7 +24,7 @@
         ← Back to Modules
       </a>
       <h1 class="h1">{module.title}</h1>
-      <p class="text-lg">{module.description}</p>
+      <p class="text-lg">{module.description || 'No description available'}</p>
       
       <!-- Progress Bar -->
       <div class="space-y-2">
@@ -43,32 +48,18 @@
         <div class="space-y-2">
           <div class="flex justify-between">
             <span>Duration</span>
-            <span>{module.duration || 'N/A'} </span>
+            <span>{module.duration || 'N/A'}</span>
           </div>
           <div class="flex justify-between">
             <span>Level</span>
             <span class="capitalize">{module.difficulty_level || 'N/A'}</span>
           </div>
-          {#if module.prerequisites}
-            <div>
-              <span class="font-semibold">Prerequisites:</span>
-              <p>{module.prerequisites}</p>
-            </div>
-          {/if}
+          <div class="flex justify-between">
+            <span>Discipline</span>
+            <span class="capitalize">{module.discipline || 'N/A'}</span>
+          </div>
         </div>
       </div>
-
-      <!-- Learning Objectives -->
-      {#if objectives.length > 0}
-        <div class="card p-6 space-y-4">
-          <h2 class="h2">Learning Objectives</h2>
-          <ul class="list-disc list-inside space-y-2">
-            {#each objectives as objective}
-              <li>{objective}</li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
     </div>
 
     <!-- Continue/Start Button -->
@@ -76,11 +67,11 @@
       <button 
         class="btn variant-filled-primary"
         on:click={() => {
-          // TODO: Implement lesson navigation
-          console.log('Starting/Continuing module:', moduleId);
+          // Use the module_id for navigation
+          goto(`/dashboard/learning/modules/${module.module_id}/content`);
         }}
       >
-        {progress ? 'Continue Module' : 'Start Module'}
+        {progress?.progress && progress.progress > 0 ? 'Continue Module' : 'Start Module'}
       </button>
     </div>
   {:else}

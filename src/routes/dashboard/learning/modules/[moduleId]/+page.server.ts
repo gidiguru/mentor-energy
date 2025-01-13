@@ -18,10 +18,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   try {
     console.log('[Module Load] Fetching module details');
+    
+    // Change .eq('module_id', params.moduleId) to .eq('id', params.moduleId)
     const { data: module, error: moduleError } = await locals.supabase
       .from('learning_modules')
       .select('*')
-      .eq('module_id', params.moduleId)
+      .eq('module_id', params.moduleId)  // Use 'id' instead of 'module_id'
       .single();
 
     console.log('[Module Load] Module fetch result', { 
@@ -30,7 +32,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       error: moduleError 
     });
 
-    if (moduleError) {
+    if (moduleError || !module) {
       console.error('[Module Load] Module fetch failed', moduleError);
       throw error(404, 'Module not found');
     }
@@ -56,12 +58,27 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
     if (progressError) {
       console.error('[Module Load] Progress fetch failed', progressError);
+      // Optionally, create a new progress record
+      const { data: newProgress, error: insertError } = await locals.supabase
+        .from('module_progress')
+        .insert({
+          user_id: user.id,
+          module_id: module.id,
+          progress: 0,
+          completed: false
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('[Module Load] Failed to create progress', insertError);
+      }
     }
 
     return {
       module,
       progress: progress || null,
-      moduleId: params.moduleId
+      moduleId: module.id  // Return the actual module ID
     };
   } catch (err) {
     console.error('[Module Load] Unexpected error', {

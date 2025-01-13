@@ -12,7 +12,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Save completion data
     const { error: progressError } = await locals.supabase
-      .from('user_progress')
+      .from('section_progress')
       .upsert({
         user_id: session.user.id,
         module_id: moduleId,

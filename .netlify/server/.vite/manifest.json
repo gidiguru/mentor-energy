@@ -140,7 +140,7 @@
       "_stores.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.Degelq7S.css"
+      "_app/immutable/assets/_layout.BqqVI6Hp.css"
     ]
   },
   "src/routes/+layout.ts": {
@@ -371,7 +371,7 @@
       "_ProgressBar.svelte_svelte_type_style_lang.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.DUuB39r-.css"
+      "_app/immutable/assets/_layout.asYRW-2W.css"
     ]
   },
   "src/routes/dashboard/+page.server.ts": {
@@ -423,7 +423,16 @@
       "_client.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.Dk06gNHp.css"
+      "_app/immutable/assets/_page.CG6JNkiu.css"
+    ]
+  },
+  "src/routes/dashboard/learning/modules/[moduleId]/+layout.server.ts": {
+    "file": "entries/pages/dashboard/learning/modules/_moduleId_/_layout.server.ts.js",
+    "name": "entries/pages/dashboard/learning/modules/_moduleId_/_layout.server.ts",
+    "src": "src/routes/dashboard/learning/modules/[moduleId]/+layout.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
     ]
   },
   "src/routes/dashboard/learning/modules/[moduleId]/+layout.svelte": {
@@ -434,6 +443,12 @@
     "imports": [
       "_ssr.js"
     ]
+  },
+  "src/routes/dashboard/learning/modules/[moduleId]/+layout.ts": {
+    "file": "entries/pages/dashboard/learning/modules/_moduleId_/_layout.ts.js",
+    "name": "entries/pages/dashboard/learning/modules/_moduleId_/_layout.ts",
+    "src": "src/routes/dashboard/learning/modules/[moduleId]/+layout.ts",
+    "isEntry": true
   },
   "src/routes/dashboard/learning/modules/[moduleId]/+page.server.ts": {
     "file": "entries/pages/dashboard/learning/modules/_moduleId_/_page.server.ts.js",
@@ -451,10 +466,31 @@
     "isEntry": true,
     "imports": [
       "_ssr.js",
-      "_ProgressBar.svelte_svelte_type_style_lang.js"
+      "_client.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.ApciN1GP.css"
+      "_app/immutable/assets/_page.C0es91vZ.css"
+    ]
+  },
+  "src/routes/dashboard/learning/modules/[moduleId]/content/+page.server.ts": {
+    "file": "entries/pages/dashboard/learning/modules/_moduleId_/content/_page.server.ts.js",
+    "name": "entries/pages/dashboard/learning/modules/_moduleId_/content/_page.server.ts",
+    "src": "src/routes/dashboard/learning/modules/[moduleId]/content/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/dashboard/learning/modules/[moduleId]/content/+page.svelte": {
+    "file": "entries/pages/dashboard/learning/modules/_moduleId_/content/_page.svelte.js",
+    "name": "entries/pages/dashboard/learning/modules/_moduleId_/content/_page.svelte",
+    "src": "src/routes/dashboard/learning/modules/[moduleId]/content/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.CSsFLHjh.css"
     ]
   },
   "src/routes/dashboard/profile/+page.svelte": {
@@ -683,6 +719,15 @@
     "file": "entries/pages/supabase-test/_page.svelte.js",
     "name": "entries/pages/supabase-test/_page.svelte",
     "src": "src/routes/supabase-test/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ]
+  },
+  "src/routes/test-animations/+page.svelte": {
+    "file": "entries/pages/test-animations/_page.svelte.js",
+    "name": "entries/pages/test-animations/_page.svelte",
+    "src": "src/routes/test-animations/+page.svelte",
     "isEntry": true,
     "imports": [
       "_ssr.js"

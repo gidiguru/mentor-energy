@@ -1,4 +1,4 @@
-import { c as create_ssr_component, f as createEventDispatcher, b as add_attribute, e as escape, s as subscribe, v as validate_component, a as each } from "../../../chunks/ssr.js";
+import { c as create_ssr_component, h as createEventDispatcher, b as add_attribute, e as escape, s as subscribe, v as validate_component, a as each } from "../../../chunks/ssr.js";
 import "../../../chunks/client.js";
 import { L as LinkedInIcon } from "../../../chunks/LinkedInIcon.js";
 import { p as page } from "../../../chunks/stores.js";

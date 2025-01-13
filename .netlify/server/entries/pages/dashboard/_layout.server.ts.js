@@ -7,7 +7,7 @@ const load = async ({ locals }) => {
   try {
     const { data: profile, error: profileError } = await locals.supabase.from("users").select("*").eq("id", session.user.id).single();
     if (profileError) throw profileError;
-    const { data: stats, error: statsError } = await locals.supabase.from("user_progress").select("*").eq("user_id", session.user.id);
+    const { data: stats, error: statsError } = await locals.supabase.from("module_progress").select("*").eq("user_id", session.user.id);
     if (statsError) throw statsError;
     const completedModules = stats.filter((s) => s.completed).length;
     const totalModules = stats.length;

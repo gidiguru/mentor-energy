@@ -7,10 +7,10 @@ function __memo(fn) {
 return {
 	appDir: "_app",
 	appPath: "_app",
-	assets: new Set(["favicon.png","logos/mentorenergy_Black_Logo.svg","logos/mentorenergy_Black_Logo2.svg","logos/mentorenergy_Inverted_Color.svg","logos/mentorenergy_logos.afdesign","logos/mentorenergy_logos.png","logos/mentorenergy_logos2.afdesign","logos/mentorenergy_logos2_only.svg","logos/mentorenergy_logo_alone.png","logos/mentorenergy_logo_alone_black.png","logos/mentorenergy_logo_linkedin.svg","logos/mentorenergy_Logo_Symbol.svg","logos/mentorenergy_Logo_Symbol2.svg","logos/mentorenergy_Logo_Symbol2_dark.svg","logos/mentorenergy_Main_Logo.svg","logos/mentorenergy_Main_Logo2.svg","logos/mentorenergy_White_logo.svg"]),
-	mimeTypes: {".png":"image/png",".svg":"image/svg+xml"},
+	assets: new Set(["empty-captions.vtt","favicon.png","logos/mentorenergy_Black_Logo.svg","logos/mentorenergy_Black_Logo2.svg","logos/mentorenergy_Inverted_Color.svg","logos/mentorenergy_logos.afdesign","logos/mentorenergy_logos.png","logos/mentorenergy_logos2.afdesign","logos/mentorenergy_logos2_only.svg","logos/mentorenergy_logo_alone.png","logos/mentorenergy_logo_alone_black.png","logos/mentorenergy_logo_linkedin.svg","logos/mentorenergy_Logo_Symbol.svg","logos/mentorenergy_Logo_Symbol2.svg","logos/mentorenergy_Logo_Symbol2_dark.svg","logos/mentorenergy_Main_Logo.svg","logos/mentorenergy_Main_Logo2.svg","logos/mentorenergy_White_logo.svg"]),
+	mimeTypes: {".vtt":"text/vtt",".png":"image/png",".svg":"image/svg+xml"},
 	_: {
-		client: {"start":"_app/immutable/entry/start.7bWEEWkd.js","app":"_app/immutable/entry/app.B5-es7ud.js","imports":["_app/immutable/entry/start.7bWEEWkd.js","_app/immutable/chunks/entry.gI6Wngmu.js","_app/immutable/chunks/scheduler.SkWvRp4G.js","_app/immutable/chunks/index.DanwDDwR.js","_app/immutable/entry/app.B5-es7ud.js","_app/immutable/chunks/preload-helper.C1FmrZbK.js","_app/immutable/chunks/scheduler.SkWvRp4G.js","_app/immutable/chunks/index.GshdcV3z.js"],"stylesheets":[],"fonts":[],"uses_env_dynamic_public":false},
+		client: {"start":"_app/immutable/entry/start.IF7xSlRV.js","app":"_app/immutable/entry/app.BdRwBwhN.js","imports":["_app/immutable/entry/start.IF7xSlRV.js","_app/immutable/chunks/entry.0fr2dFsL.js","_app/immutable/chunks/scheduler.U2msqvy9.js","_app/immutable/chunks/index.Cgh1KLMs.js","_app/immutable/entry/app.BdRwBwhN.js","_app/immutable/chunks/preload-helper.C1FmrZbK.js","_app/immutable/chunks/scheduler.U2msqvy9.js","_app/immutable/chunks/index.BFhDyFNX.js"],"stylesheets":[],"fonts":[],"uses_env_dynamic_public":false},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -48,7 +48,9 @@ return {
 			__memo(() => import('./nodes/33.js')),
 			__memo(() => import('./nodes/34.js')),
 			__memo(() => import('./nodes/35.js')),
-			__memo(() => import('./nodes/36.js'))
+			__memo(() => import('./nodes/36.js')),
+			__memo(() => import('./nodes/37.js')),
+			__memo(() => import('./nodes/38.js'))
 		],
 		routes: [
 			{
@@ -171,101 +173,115 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/dashboard/learning/modules/[moduleId]/content",
+				pattern: /^\/dashboard\/learning\/modules\/([^/]+?)\/content\/?$/,
+				params: [{"name":"moduleId","optional":false,"rest":false,"chained":false}],
+				page: { layouts: [0,3,4,5,], errors: [1,,,,], leaf: 23 },
+				endpoint: null
+			},
+			{
 				id: "/dashboard/profile",
 				pattern: /^\/dashboard\/profile\/?$/,
 				params: [],
-				page: { layouts: [0,3,], errors: [1,,], leaf: 23 },
+				page: { layouts: [0,3,], errors: [1,,], leaf: 24 },
 				endpoint: null
 			},
 			{
 				id: "/legal",
 				pattern: /^\/legal\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 24 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 25 },
 				endpoint: null
 			},
 			{
 				id: "/legal/cookies",
 				pattern: /^\/legal\/cookies\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 25 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 26 },
 				endpoint: null
 			},
 			{
 				id: "/legal/privacy",
 				pattern: /^\/legal\/privacy\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 26 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 27 },
 				endpoint: null
 			},
 			{
 				id: "/legal/terms",
 				pattern: /^\/legal\/terms\/?$/,
 				params: [],
-				page: { layouts: [0,6,], errors: [1,,], leaf: 27 },
+				page: { layouts: [0,6,], errors: [1,,], leaf: 28 },
 				endpoint: null
 			},
 			{
 				id: "/mentor-faq",
 				pattern: /^\/mentor-faq\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 28 },
+				page: { layouts: [0,], errors: [1,], leaf: 29 },
 				endpoint: null
 			},
 			{
 				id: "/mentor-resources",
 				pattern: /^\/mentor-resources\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 29 },
+				page: { layouts: [0,], errors: [1,], leaf: 30 },
 				endpoint: null
 			},
 			{
 				id: "/mentors",
 				pattern: /^\/mentors\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 30 },
+				page: { layouts: [0,], errors: [1,], leaf: 31 },
 				endpoint: null
 			},
 			{
 				id: "/pricing",
 				pattern: /^\/pricing\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 31 },
+				page: { layouts: [0,], errors: [1,], leaf: 32 },
 				endpoint: null
 			},
 			{
 				id: "/private",
 				pattern: /^\/private\/?$/,
 				params: [],
-				page: { layouts: [0,7,], errors: [1,,], leaf: 32 },
+				page: { layouts: [0,7,], errors: [1,,], leaf: 33 },
 				endpoint: null
 			},
 			{
 				id: "/profile",
 				pattern: /^\/profile\/?$/,
 				params: [],
-				page: { layouts: [0,8,], errors: [1,,], leaf: 33 },
+				page: { layouts: [0,8,], errors: [1,,], leaf: 34 },
 				endpoint: null
 			},
 			{
 				id: "/resources",
 				pattern: /^\/resources\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 34 },
+				page: { layouts: [0,], errors: [1,], leaf: 35 },
 				endpoint: null
 			},
 			{
 				id: "/signup",
 				pattern: /^\/signup\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 35 },
+				page: { layouts: [0,], errors: [1,], leaf: 36 },
 				endpoint: null
 			},
 			{
 				id: "/supabase-test",
 				pattern: /^\/supabase-test\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 36 },
+				page: { layouts: [0,], errors: [1,], leaf: 37 },
+				endpoint: null
+			},
+			{
+				id: "/test-animations",
+				pattern: /^\/test-animations\/?$/,
+				params: [],
+				page: { layouts: [0,], errors: [1,], leaf: 38 },
 				endpoint: null
 			}
 		],

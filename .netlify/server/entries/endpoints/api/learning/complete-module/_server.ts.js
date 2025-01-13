@@ -6,7 +6,7 @@ const POST = async ({ request, locals }) => {
   }
   try {
     const { moduleId, answers } = await request.json();
-    const { error: progressError } = await locals.supabase.from("user_progress").upsert({
+    const { error: progressError } = await locals.supabase.from("section_progress").upsert({
       user_id: session.user.id,
       module_id: moduleId,
       completed: true,

@@ -1,6 +1,6 @@
 import { P as PUBLIC_SUPABASE_URL, a as PUBLIC_SUPABASE_ANON_KEY } from "./public.js";
 import { createServerClient } from "@supabase/ssr";
-import { r as redirect } from "./index.js";
+import { r as redirect, e as error } from "./index.js";
 function sequence(...handlers) {
   const length = handlers.length;
   if (!length) return ({ event, resolve }) => resolve(event);
@@ -63,6 +63,14 @@ const supabase = async ({ event, resolve }) => {
   });
 };
 const authGuard = async ({ event, resolve }) => {
+  console.log("[AUTH GUARD] Full URL:", event.url.toString());
+  console.log("[AUTH GUARD] Pathname:", event.url.pathname);
+  console.log("[AUTH GUARD] Params:", event.params);
+  const moduleRouteMatch = event.url.pathname.match(/^\/dashboard\/modules\/([^/]+)\/content$/);
+  if (moduleRouteMatch) {
+    event.params.moduleId = moduleRouteMatch[1];
+    console.log("[AUTH GUARD] Extracted Module ID:", event.params.moduleId);
+  }
   if (event.url.pathname === "/auth/callback") {
     const code = event.url.searchParams.get("code");
     if (code) {
@@ -94,15 +102,31 @@ const authGuard = async ({ event, resolve }) => {
   const { session, user } = await event.locals.safeGetSession();
   event.locals.session = session;
   event.locals.user = user;
+  if (event.url.pathname.startsWith("/dashboard/learning/modules/") && event.url.pathname.includes("/content")) {
+    if (!session) {
+      console.warn("[AUTH GUARD] Unauthorized module access attempt");
+      throw redirect(303, "/auth");
+    }
+    try {
+      const { data: module, error: moduleError } = await event.locals.supabase.from("learning_modules").select("*").eq("module_id", event.params.moduleId).single();
+      if (moduleError || !module) {
+        console.error("[AUTH GUARD] Module not found:", moduleError);
+        throw error(404, "Module not found");
+      }
+    } catch (err) {
+      console.error("[AUTH GUARD] Module validation error:", err);
+      throw error(500, "Failed to validate module");
+    }
+  }
   const protectedRoutes = ["/dashboard", "/profile"];
   const isProtectedRoute = protectedRoutes.some(
     (route) => event.url.pathname.startsWith(route)
   );
   if (!session && isProtectedRoute) {
-    throw redirect(303, "/auth/complete-signup");
+    throw redirect(303, "/auth");
   }
   if (session && event.url.pathname === "/auth") {
-    throw redirect(303, "/auth/complete-signup");
+    throw redirect(303, "/dashboard");
   }
   return resolve(event);
 };
