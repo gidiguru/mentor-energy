@@ -52,14 +52,7 @@
   }
 
   function toggleDrawer(): void {
-    drawerStore.set({
-      id: 'mobile-nav',
-      position: 'right',
-      width: 'w-80',
-      padding: 'p-4',
-      open: true,
-      bgBackdrop: 'bg-black/50'
-    });
+    drawerStore.open();
   }
 </script>
 

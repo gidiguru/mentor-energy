@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AppShell } from '@skeletonlabs/skeleton';
+  import { AppShell, Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
   import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
   import { storePopup, initializeStores } from '@skeletonlabs/skeleton';
   import { invalidate, afterNavigate } from '$app/navigation';
@@ -146,6 +146,9 @@
 </script>
 
 <Toast />
+<Drawer>
+  <MobileNav />
+</Drawer>
 <AppShell>
   <svelte:fragment slot="header">
     <Header 
@@ -167,5 +170,3 @@
     </div>
   </Footer>
 </AppShell>
-
-<MobileNav />
