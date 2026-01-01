@@ -31,7 +31,8 @@ export default async (req: Request, context: Context) => {
   }
 };
 
-// Run every hour at minute 0
+// Run twice daily at 8am and 6pm WAT (West Africa Time = UTC+1)
+// 7:00 and 17:00 UTC = 8:00 and 18:00 WAT
 export const config: Config = {
-  schedule: "0 * * * *",
+  schedule: "0 7,17 * * *",
 };
